@@ -1,0 +1,11 @@
+<h2>My Applications</h2>
+
+{% for app in apps %}
+    <div style="border:1px solid black; padding:10px; margin:10px;">
+        <h3>{{ app.job.title }}</h3>
+        <p><b>Company:</b> {{ app.job.company }}</p>
+        <p><b>Applied Date:</b> {{ app.applied_date }}</p>
+    </div>
+{% empty %}
+    <p>No applications yet.</p>
+{% endfor %}

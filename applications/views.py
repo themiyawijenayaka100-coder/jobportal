@@ -11,3 +11,10 @@ def apply_job(request, job_id):
     )
 
     return redirect('job_list')
+
+from django.shortcuts import render
+from .models import Application
+
+def my_applications(request):
+    apps = Application.objects.filter(user=request.user)
+    return render(request, 'my_applications.html', {'apps': apps})
