@@ -17,3 +17,7 @@ def create_job(request):
         return redirect('create_job')
 
     return render(request, 'create_job.html')
+
+def job_list(request):
+    jobs = Job.objects.all()
+    return render(request, 'job_list.html', {'jobs': jobs})
