@@ -1,3 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
 <h2>Job List</h2>
 
 {% for job in jobs %}
@@ -5,8 +9,11 @@
         <h3>{{ job.title }}</h3>
         <p><b>Company:</b> {{ job.company }}</p>
         <p>{{ job.description }}</p>
+
         <a href="/applications/apply/{{ job.id }}/">
-           <button>Apply</button>
+            <button>Apply</button>
         </a>
     </div>
 {% endfor %}
+
+{% endblock %}

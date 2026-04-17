@@ -1,3 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
 <h2>Login</h2>
 
 <form method="POST">
@@ -12,3 +16,5 @@
 {% if error %}
 <p style="color:red;">{{ error }}</p>
 {% endif %}
+
+{% endblock %}

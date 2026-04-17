@@ -1,3 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
 <h2>My Applications</h2>
 
 {% for app in apps %}
@@ -9,3 +13,5 @@
 {% empty %}
     <p>No applications yet.</p>
 {% endfor %}
+
+{% endblock %}
