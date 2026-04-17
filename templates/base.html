@@ -7,11 +7,18 @@
 
 <!-- Navigation Bar -->
 <div style="background-color:lightgray; padding:10px;">
-    <a href="/login/">Login</a> |
-    <a href="/register/">Register</a> |
-    <a href="/jobs/">Jobs</a> |
-    <a href="/jobs/create/">Post Job</a> |
-    <a href="/applications/my/">My Applications</a>
+
+    <a href="/">Home</a> |
+
+    {% if user.is_authenticated %}
+        <a href="/jobs/">Jobs</a> |
+        <a href="/jobs/create/">Post Job</a> |
+        <a href="/applications/my/">My Applications</a>
+    {% else %}
+        <a href="/login/">Login</a> |
+        <a href="/register/">Register</a>
+    {% endif %}
+
 </div>
 
 <hr>

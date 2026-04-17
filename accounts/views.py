@@ -9,7 +9,7 @@ def register(request):
         
         user = User.objects.create_user(username=username, password=password)
         login(request, user)
-        return redirect('register')  # temporary
+        return redirect('login') 
     
     return render(request, 'register.html')
 
@@ -25,8 +25,11 @@ def user_login(request):
 
         if user is not None:
             login(request, user)
-            return redirect('login')
+            return redirect('home')
         else:
             return render(request, 'login.html', {'error': 'Invalid credentials'})
 
     return render(request, 'login.html')
+
+def home(request):
+    return render(request, 'home.html')
