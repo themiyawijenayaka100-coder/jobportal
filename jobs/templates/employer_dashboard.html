@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Employer Dashboard</h2>
+<hr>
+
+<h3>My Job Postings</h3>
+
+{% for job in my_jobs %}
+    <div style="border:1px solid black; padding:10px; margin-bottom:15px;">
+        <h4>{{ job.title }}</h4>
+        <p><b>Total Applicants:</b> {{ job.application_set.count }}</p>
+        
+        <a href="#"><button>View Applications</button></a>
+    </div>
+{% empty %}
+    <p>You have not posted any jobs yet.</p>
+{% endfor %}
+
+{% endblock %}
