@@ -1,0 +1,12 @@
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+
+# Local database (Usually you ignore this, but if your group wants it shared, remove this line)
+# db.sqlite3
