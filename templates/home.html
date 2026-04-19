@@ -1,26 +1,28 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="p-5 mb-4 bg-white rounded-3 shadow-sm border text-center">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">Welcome to the Job Portal</h1>
+        
+        {% if user.is_authenticated %}
+            <h3 class="mb-4">Welcome back, {{ user.username }} 👋</h3>
+            <hr class="my-4">
+            
+            {% if user.groups.all.0.name == 'Employer' %}
+                <p class="lead mt-3">Manage your recruitment process.</p>
+                <a href="{% url 'employer_dashboard' %}" class="btn btn-success btn-lg px-4">Go to Employer Dashboard</a>
+            {% else %}
+                <p class="lead mt-3">Want to hire talent?</p>
+                <a href="{% url 'become_employer' %}" class="btn btn-warning btn-lg px-4">Become an Employer</a>
+            {% endif %}
 
-<h2>Welcome to Job Portal</h2>
-
-{% if user.is_authenticated %}
-
-    <p>Welcome, {{ user.username }} 👋</p>
-
-    <a href="{% url 'job_list' %}"><button>View Jobs</button></a>
-    <a href="{% url 'create_job' %}"><button>Post Job</button></a>
-    <a href="{% url 'my_applications' %}"><button>My Applications</button></a>
-    <a href="/logout/"><button>Logout</button></a>
-
-{% else %}
-
-    <p>If you don’t have an account, please register.</p>
-    <a href="{% url 'register' %}"><button>Register</button></a>
-
-    <p>If you already have an account, please login.</p>
-    <a href="{% url 'login' %}"><button>Login</button></a>
-
-{% endif %}
-
+        {% else %}
+            <div class="mt-4">
+                <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-4 gap-3">Register Now</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg px-4">Login</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
