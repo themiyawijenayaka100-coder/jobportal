@@ -1,17 +1,14 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
-
-# -------------------------
-# REGISTER
-# -------------------------
+#register
 def register(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
 
-        # Prevent duplicate usernames (IMPORTANT FIX)
         if User.objects.filter(username=username).exists():
             return render(request, 'register.html', {
                 'error': 'Username already exists'
@@ -19,15 +16,11 @@ def register(request):
 
         user = User.objects.create_user(username=username, password=password)
         login(request, user)
-
         return redirect('home')
 
     return render(request, 'register.html')
 
-
-# -------------------------
-# LOGIN
-# -------------------------
+#login
 def user_login(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -45,17 +38,18 @@ def user_login(request):
 
     return render(request, 'login.html')
 
-
-# -------------------------
-# LOGOUT
-# -------------------------
+#logout
 def user_logout(request):
     logout(request)
     return redirect('home')
 
-
-# -------------------------
-# HOME
-# -------------------------
+#home
 def home(request):
     return render(request, 'home.html')
+
+#become an emploeyer
+@login_required
+def become_employer(request):
+    employer_group, created = Group.objects.get_or_create(name='Employer')
+    request.user.groups.add(employer_group)
+    return redirect('home')
