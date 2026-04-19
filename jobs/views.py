@@ -29,3 +29,13 @@ def create_job(request):
         return redirect('job_list')
 
     return render(request, 'create_job.html')
+
+#employer dashboard
+@login_required
+def employer_dashboard(request):
+    if not request.user.groups.filter(name='Employer').exists():
+        return redirect('home')
+    
+    my_jobs = Job.objects.filter(created_by=request.user)
+    
+    return render(request, 'employer_dashboard.html', {'my_jobs': my_jobs})
