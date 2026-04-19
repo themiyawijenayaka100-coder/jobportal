@@ -7,7 +7,18 @@ from applications.models import Application
 
 # view all jobs
 def job_list(request):
-    jobs = Job.objects.all()
+    jobs = Job.objects.all().order_by('-id') # Show newest first
+    
+    if request.user.is_authenticated:
+        # Get all applications for this user
+        user_apps = Application.objects.filter(user=request.user)
+        # Create a dictionary of {job_id: status}
+        app_dict = {app.job_id: app.status for app in user_apps}
+        
+        # Attach the status to each job dynamically
+        for job in jobs:
+            job.applied_status = app_dict.get(job.id, None)
+
     return render(request, 'job_list.html', {'jobs': jobs})
 
 # create a job
