@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-warning">
+            <div class="card-header bg-warning text-dark fw-bold">
+                Upgrade to Employer Account
+            </div>
+            <div class="card-body">
+                <p>By upgrading your account, you will be able to post job vacancies and manage candidate applications.</p>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="terms" required>
+                        <label class="form-check-label" for="terms">
+                            I agree to the Employer Terms of Service and Recruitment Policies.
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100 fw-bold">Confirm Upgrade</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
