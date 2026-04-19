@@ -1,21 +1,33 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<h2>Employer Dashboard</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Employer Dashboard</h2>
+    <a href="{% url 'create_job' %}" class="btn btn-success">+ Post New Job</a>
+</div>
 <hr>
 
-<h3>My Job Postings</h3>
-
-{% for job in my_jobs %}
-    <div style="border:1px solid black; padding:10px; margin-bottom:15px;">
-        <h4>{{ job.title }}</h4>
-        <p><b>Total Applicants:</b> {{ job.application_set.count }}</p>
-        
-        <a href="#"><button>View Applications</button></a>
+<div class="row mt-4">
+    {% for job in my_jobs %}
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-start border-success border-4">
+            <div class="card-body">
+                <h4 class="card-title">{{ job.title }}</h4>
+                <p class="card-text mb-3">
+                    <b>Total Candidates:</b> 
+                    <span class="badge bg-primary rounded-pill fs-6">{{ job.application_set.count }}</span>
+                </p>
+                <a href="{% url 'manage_job_applications' job.id %}" class="btn btn-outline-success w-100">
+                    Manage Candidates
+                </a>
+            </div>
+        </div>
     </div>
-{% empty %}
-    <p>You have not posted any jobs yet.</p>
-{% endfor %}
-
+    {% empty %}
+    <div class="col-12 text-center mt-5">
+        <p class="text-muted fs-5">You have not posted any job vacancies yet.</p>
+        <a href="{% url 'create_job' %}" class="btn btn-primary">Create Your First Job</a>
+    </div>
+    {% endfor %}
+</div>
 {% endblock %}
