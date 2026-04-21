@@ -1,0 +1,4 @@
+Django>=6.0
+Pillow>=12.2
+django-crispy-forms>=2.4
+crispy-bootstrap5>=2025.6
