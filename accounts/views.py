@@ -4,23 +4,27 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib import messages
+from .forms import RegisterForm
 
 #register
 def register(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')
 
-        if User.objects.filter(username=username).exists():
-            return render(request, 'register.html', {
-                'error': 'Username already exists'
-            })
+        error = next(iter(form.errors.get("__all__", [])), None)
+        if error is None:
+            # Prefer username/password field errors if present
+            error = next(
+                iter(form.errors.get("username", []) or form.errors.get("password", []) or []),
+                "Please correct the errors below.",
+            )
+        return render(request, 'register.html', {"form": form, "error": error})
 
-        user = User.objects.create_user(username=username, password=password)
-        login(request, user)
-        return redirect('home')
-
-    return render(request, 'register.html')
+    return render(request, 'register.html', {"form": RegisterForm()})
 
 #login
 def user_login(request):

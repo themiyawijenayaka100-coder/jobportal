@@ -4,6 +4,7 @@ from django.http import HttpResponseForbidden
 from .models import Job
 from django.shortcuts import get_object_or_404
 from applications.models import Application
+from .forms import JobForm
 
 # view all jobs
 def job_list(request):
@@ -29,19 +30,15 @@ def create_job(request):
         return HttpResponseForbidden("Access Denied: Only employers can post jobs. Please upgrade your account.")
 
     if request.method == 'POST':
-        title = request.POST['title']
-        description = request.POST['description']
-        company = request.POST['company']
+        form = JobForm(request.POST)
+        if form.is_valid():
+            job = form.save(commit=False)
+            job.created_by = request.user
+            job.save()
+            return redirect('job_list')
+        return render(request, 'create_job.html', {"form": form})
 
-        Job.objects.create(
-            title=title,
-            description=description,
-            company=company,
-            created_by=request.user
-        )
-        return redirect('job_list')
-
-    return render(request, 'create_job.html')
+    return render(request, 'create_job.html', {"form": JobForm()})
 
 #employer dashboard
 @login_required
