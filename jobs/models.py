@@ -7,5 +7,9 @@ class Job(models.Model):
     company = models.CharField(max_length=100)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    @property
+    def employer(self):
+        return self.created_by
+
     def __str__(self):
         return self.title

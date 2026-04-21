@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <h3 class="mb-0">Edit Job</h3>
+        <div class="text-muted small mt-1">
+          Updating: <span class="fw-semibold">{{ job.title }}</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <form method="POST" novalidate>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+          {% endif %}
+
+          <div class="mb-3">
+            <label class="form-label">Job Title</label>
+            <input
+              type="text"
+              name="title"
+              class="form-control {% if form.title.errors %}is-invalid{% endif %}"
+              value="{{ form.title.value|default_if_none:'' }}"
+              placeholder="e.g., Backend Developer"
+              required
+            >
+            {% if form.title.errors %}
+              <div class="invalid-feedback">{{ form.title.errors|striptags }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Company</label>
+            <input
+              type="text"
+              name="company"
+              class="form-control {% if form.company.errors %}is-invalid{% endif %}"
+              value="{{ form.company.value|default_if_none:'' }}"
+              placeholder="e.g., Acme Corp"
+              required
+            >
+            {% if form.company.errors %}
+              <div class="invalid-feedback">{{ form.company.errors|striptags }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea
+              name="description"
+              class="form-control {% if form.description.errors %}is-invalid{% endif %}"
+              rows="6"
+              placeholder="Describe the role, responsibilities, and requirements..."
+              required
+            >{{ form.description.value|default_if_none:'' }}</textarea>
+            {% if form.description.errors %}
+              <div class="invalid-feedback">{{ form.description.errors|striptags }}</div>
+            {% endif %}
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{% url 'employer_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+            <a href="{% url 'delete_job' job.id %}" class="btn btn-outline-danger ms-auto">Delete Job</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

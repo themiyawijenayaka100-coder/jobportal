@@ -5,6 +5,7 @@ from .models import Job
 from django.shortcuts import get_object_or_404
 from applications.models import Application
 from .forms import JobForm
+from django.contrib import messages
 
 # view all jobs
 def job_list(request):
@@ -39,6 +40,42 @@ def create_job(request):
         return render(request, 'create_job.html', {"form": form})
 
     return render(request, 'create_job.html', {"form": JobForm()})
+
+
+@login_required
+def edit_job(request, job_id):
+    job = get_object_or_404(Job, id=job_id)
+
+    if job.created_by != request.user:
+        messages.error(request, "Access denied: you can only edit your own job posts.")
+        return redirect("job_list")
+
+    if request.method == "POST":
+        form = JobForm(request.POST, instance=job)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Job updated successfully.")
+            return redirect("employer_dashboard")
+        return render(request, "edit_job.html", {"form": form, "job": job})
+
+    form = JobForm(instance=job)
+    return render(request, "edit_job.html", {"form": form, "job": job})
+
+
+@login_required
+def delete_job(request, job_id):
+    job = get_object_or_404(Job, id=job_id)
+
+    if job.created_by != request.user:
+        messages.error(request, "Access denied: you can only delete your own job posts.")
+        return redirect("job_list")
+
+    if request.method == "POST":
+        job.delete()
+        messages.success(request, "Job deleted successfully.")
+        return redirect("employer_dashboard")
+
+    return render(request, "delete_job_confirm.html", {"job": job})
 
 #employer dashboard
 @login_required
