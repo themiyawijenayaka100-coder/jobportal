@@ -3,6 +3,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.contrib import messages
 
 #register
 def register(request):
@@ -43,6 +44,7 @@ def user_login(request):
 @require_POST
 def user_logout(request):
     logout(request)
+    messages.success(request, "You have been successfully logged out.")
     return redirect('home')
 
 #home
