@@ -6,22 +6,33 @@ from django.shortcuts import get_object_or_404
 from applications.models import Application
 from .forms import JobForm
 from django.contrib import messages
+from django.db.models import Q
+from django.core.paginator import Paginator
 
 # view all jobs
 def job_list(request):
-    jobs = Job.objects.all().order_by('-id') # Show newest first
+    q = (request.GET.get("q") or "").strip()
+    jobs_qs = Job.objects.all().order_by("-id")  # Show newest first
+
+    if q:
+        jobs_qs = jobs_qs.filter(Q(title__icontains=q) | Q(description__icontains=q))
     
     if request.user.is_authenticated:
         # Get all applications for this user
         user_apps = Application.objects.filter(user=request.user)
         # Create a dictionary of {job_id: status}
         app_dict = {app.job_id: app.status for app in user_apps}
-        
-        # Attach the status to each job dynamically
-        for job in jobs:
+
+    paginator = Paginator(jobs_qs, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    if request.user.is_authenticated:
+        # Attach the status to each job on this page only
+        for job in page_obj:
             job.applied_status = app_dict.get(job.id, None)
 
-    return render(request, 'job_list.html', {'jobs': jobs})
+    return render(request, "job_list.html", {"page_obj": page_obj, "q": q})
 
 # create a job
 @login_required
