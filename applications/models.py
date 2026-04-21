@@ -14,5 +14,10 @@ class Application(models.Model):
     applied_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "job"], name="unique_application_per_user_job"),
+        ]
+
     def __str__(self):
         return f"{self.user.username} - {self.job.title} ({self.status})"
