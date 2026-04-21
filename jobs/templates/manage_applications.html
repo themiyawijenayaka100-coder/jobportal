@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card shadow-sm mt-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Applicants for: {{ job.title }}</h4>
+        <a href="{% url 'employer_dashboard' %}" class="btn btn-sm btn-outline-light">← Back to Dashboard</a>
+    </div>
+    <div class="card-body">
+        {% for app in applications %}
+            <div class="border p-3 mb-3 rounded bg-light">
+                <p><b>Candidate:</b> {{ app.user.username }}</p>
+                <p class="mb-2">
+                    <b>Status:</b>
+                    <span
+                        class="badge {% if app.status == 'Accepted' %}bg-success{% elif app.status == 'Rejected' %}bg-danger{% else %}bg-secondary{% endif %}"
+                        id="status-badge-{{ app.id }}"
+                    >
+                        {{ app.status }}
+                    </span>
+                </p>
+                
+                <form method="POST" class="d-flex align-items-center gap-2 js-status-form" data-application-id="{{ app.id }}">
+                    {% csrf_token %}
+                    <input type="hidden" name="application_id" value="{{ app.id }}">
+                    <select name="status" class="form-select w-auto">
+                        <option value="Pending" {% if app.status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="Accepted" {% if app.status == 'Accepted' %}selected{% endif %}>Accepted</option>
+                        <option value="Rejected" {% if app.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary btn-sm">Update Status</button>
+                    <span class="small text-muted ms-2 d-none" id="status-saving-{{ app.id }}">Saving…</span>
+                </form>
+            </div>
+        {% empty %}
+            <p class="text-muted">No candidates have applied yet.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+  (function () {
+    function getCsrfToken(formEl) {
+      const input = formEl.querySelector('input[name="csrfmiddlewaretoken"]');
+      return input ? input.value : '';
+    }
+
+    function setBadgeStatus(appId, status) {
+      const badge = document.getElementById(`status-badge-${appId}`);
+      if (!badge) return;
+
+      badge.textContent = status;
+      badge.classList.remove('bg-secondary', 'bg-success', 'bg-danger');
+      if (status === 'Accepted') badge.classList.add('bg-success');
+      else if (status === 'Rejected') badge.classList.add('bg-danger');
+      else badge.classList.add('bg-secondary');
+    }
+
+    document.querySelectorAll('.js-status-form').forEach((formEl) => {
+      formEl.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const appId = formEl.dataset.applicationId;
+        const savingEl = document.getElementById(`status-saving-${appId}`);
+        const statusSelect = formEl.querySelector('select[name="status"]');
+        const newStatus = statusSelect ? statusSelect.value : '';
+
+        if (savingEl) savingEl.classList.remove('d-none');
+
+        try {
+          const body = new URLSearchParams();
+          body.set('application_id', appId);
+          body.set('status', newStatus);
+
+          const res = await fetch("{% url 'update_application_status' %}", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+              'X-CSRFToken': getCsrfToken(formEl),
+              'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: body.toString(),
+          });
+
+          const data = await res.json().catch(() => null);
+          if (!res.ok || !data || !data.ok) {
+            const msg = (data && data.error) ? data.error : 'Failed to update status.';
+            alert(msg);
+            return;
+          }
+
+          setBadgeStatus(appId, data.status);
+        } catch (err) {
+          alert('Network error while updating status.');
+        } finally {
+          if (savingEl) savingEl.classList.add('d-none');
+        }
+      });
+    });
+  })();
+</script>
+{% endblock %}

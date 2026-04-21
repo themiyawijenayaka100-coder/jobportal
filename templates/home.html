@@ -1,26 +1,49 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<section class="rounded-4 overflow-hidden shadow-sm border mb-5">
+    <div style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80') center/cover; padding: 5rem 2rem;">
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold text-white mb-3">Find your next role. Hire your next star.</h1>
+                    <p class="lead text-white-50 mb-4">
+                        A simple job portal for candidates and employers—browse opportunities, showcase talent, and connect faster.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{% url 'job_list' %}" class="btn btn-primary btn-lg px-4">Find Jobs</a>
+                        <a href="{% url 'talent_list' %}" class="btn btn-outline-light btn-lg px-4">Hire Talent</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-<h2>Welcome to Job Portal</h2>
-
-{% if user.is_authenticated %}
-
-    <p>Welcome, {{ user.username }} 👋</p>
-
-    <a href="{% url 'job_list' %}"><button>View Jobs</button></a>
-    <a href="{% url 'create_job' %}"><button>Post Job</button></a>
-    <a href="{% url 'my_applications' %}"><button>My Applications</button></a>
-    <a href="/logout/"><button>Logout</button></a>
-
-{% else %}
-
-    <p>If you don’t have an account, please register.</p>
-    <a href="{% url 'register' %}"><button>Register</button></a>
-
-    <p>If you already have an account, please login.</p>
-    <a href="{% url 'login' %}"><button>Login</button></a>
-
-{% endif %}
-
+<section class="bg-white rounded-4 shadow-sm border p-4 p-md-5">
+    <div class="row g-4 align-items-center">
+        <div class="col-lg-7">
+            <h2 class="fw-bold mb-3">About Job Portal</h2>
+            <p class="text-muted mb-3">
+                Job Portal helps job seekers discover roles and apply confidently, while employers can browse a growing directory of talent profiles.
+                Candidates can share a bio, skills, and profile picture so recruiters can quickly understand their strengths.
+            </p>
+            <p class="text-muted mb-0">
+                Whether you're looking for your next opportunity or searching for your next hire, we make it easy to explore, shortlist, and connect.
+            </p>
+        </div>
+        <div class="col-lg-5">
+            <div class="p-4 rounded-4 border bg-light">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'job_list' %}" class="btn btn-dark btn-lg">Browse Jobs</a>
+                    <a href="{% url 'talent_list' %}" class="btn btn-outline-dark btn-lg">Browse Talent</a>
+                </div>
+                <hr class="my-4">
+                <p class="small text-muted mb-0">
+                    Tip: Create an account to apply for jobs and contact talent.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}
