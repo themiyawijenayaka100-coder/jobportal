@@ -55,12 +55,10 @@
 
                     <div class="mt-auto pt-2">
                         {% if user.is_authenticated %}
-                            {% if profile.resume_link %}
-                                <a href="{{ profile.resume_link }}" class="btn btn-primary w-100" target="_blank" rel="noopener">Hire Me / Contact</a>
-                            {% elif profile.user.email %}
-                                <a href="mailto:{{ profile.user.email }}" class="btn btn-primary w-100">Hire Me / Contact</a>
-                            {% else %}
+                            {% if user.id == profile.user.id %}
                                 <button class="btn btn-primary w-100" type="button" disabled>Hire Me / Contact</button>
+                            {% else %}
+                                <a href="{% url 'send_message' profile.user.id %}" class="btn btn-primary w-100">Hire Me / Contact</a>
                             {% endif %}
                         {% else %}
                             <a href="{% url 'login' %}" class="btn btn-outline-primary w-100">Login to Hire</a>

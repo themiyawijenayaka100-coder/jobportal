@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from .models import UserProfile, DirectMessage
 
 
 class RegisterForm(forms.ModelForm):
@@ -23,3 +24,19 @@ class RegisterForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ["bio", "profile_picture", "resume_link", "skills"]
+
+
+class DirectMessageForm(forms.ModelForm):
+    class Meta:
+        model = DirectMessage
+        fields = ["subject", "body"]
+        widgets = {
+            "subject": forms.TextInput(attrs={"placeholder": "Subject"}),
+            "body": forms.Textarea(attrs={"rows": 6, "placeholder": "Write your message..."}),
+        }

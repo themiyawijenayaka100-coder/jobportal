@@ -1,12 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib import messages
-from .forms import RegisterForm
+from .forms import RegisterForm, UserProfileForm, DirectMessageForm
 from django.contrib.auth.forms import AuthenticationForm
-from .models import UserProfile
+from .models import UserProfile, DirectMessage
 
 #register
 def register(request):
@@ -65,3 +65,47 @@ def become_an_employer(request):
     
     # If GET request, show the confirmation form
     return render(request, 'become_an_employer.html')
+
+
+@login_required
+def edit_profile(request):
+    profile = request.user.profile
+    if request.method == "POST":
+        form = UserProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully.")
+            return redirect("edit_profile")
+    else:
+        form = UserProfileForm(instance=profile)
+
+    return render(request, "edit_profile.html", {"form": form, "profile": profile})
+
+
+@login_required
+def send_message(request, recipient_id: int):
+    recipient = get_object_or_404(User, pk=recipient_id)
+
+    if request.method == "POST":
+        form = DirectMessageForm(request.POST)
+        if form.is_valid():
+            message_obj = form.save(commit=False)
+            message_obj.sender = request.user
+            message_obj.recipient = recipient
+            message_obj.save()
+            messages.success(request, "Message sent.")
+            return redirect("inbox")
+    else:
+        form = DirectMessageForm()
+
+    return render(
+        request,
+        "send_message.html",
+        {"form": form, "recipient": recipient},
+    )
+
+
+@login_required
+def inbox(request):
+    inbox_messages = DirectMessage.objects.select_related("sender", "recipient").filter(recipient=request.user)
+    return render(request, "inbox.html", {"inbox_messages": inbox_messages})

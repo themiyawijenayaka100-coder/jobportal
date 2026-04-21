@@ -18,7 +18,9 @@
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="{% url 'job_list' %}">Find Jobs</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'talent_list' %}">Hire Talent</a></li>
+                {% if user.is_authenticated and user.groups.all.0.name == 'Employer' %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'talent_list' %}">Hire Talent</a></li>
+                {% endif %}
                 <li class="nav-item"><a class="nav-link" href="#">Stories</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">About</a></li>
             </ul>
@@ -30,6 +32,8 @@
                             {{ user.username }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'edit_profile' %}">My Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'inbox' %}">Inbox</a></li>
                             <li><a class="dropdown-item" href="{% url 'my_applications' %}">My Applications</a></li>
 
                             {% if user.groups.all.0.name == 'Employer' %}
