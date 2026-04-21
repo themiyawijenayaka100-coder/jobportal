@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 from .forms import RegisterForm
+from django.contrib.auth.forms import AuthenticationForm
 
 #register
 def register(request):
@@ -28,21 +29,14 @@ def register(request):
 
 #login
 def user_login(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            login(request, form.get_user())
+            return redirect("home")
+        return render(request, "login.html", {"form": form})
 
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            login(request, user)
-            return redirect('home')
-        else:
-            return render(request, 'login.html', {
-                'error': 'Invalid credentials'
-            })
-
-    return render(request, 'login.html')
+    return render(request, "login.html", {"form": AuthenticationForm(request)})
 
 #logout
 @require_POST

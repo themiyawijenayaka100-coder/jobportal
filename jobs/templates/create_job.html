@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-
-<h2>Create Job</h2>
-
-<form method="POST">
-    {% csrf_token %}
-
-    {% if form and form.errors %}
-        <div style="color: red;">{{ form.errors }}</div>
-    {% endif %}
-
-    <input type="text" name="title" placeholder="Job Title"><br><br>
-    <input type="text" name="company" placeholder="Company"><br><br>
-    <textarea name="description" placeholder="Description"></textarea><br><br>
-
-    <button type="submit">Post Job</button>
-</form>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="mb-3">Create Job</h2>
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary mt-2">Post Job</button>
+                    <a href="{% url 'employer_dashboard' %}" class="btn btn-outline-secondary mt-2">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
