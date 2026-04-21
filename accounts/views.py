@@ -6,6 +6,7 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 from .forms import RegisterForm
 from django.contrib.auth.forms import AuthenticationForm
+from .models import UserProfile
 
 #register
 def register(request):
@@ -48,6 +49,11 @@ def user_logout(request):
 #home
 def home(request):
     return render(request, 'home.html')
+
+#hire talent directory
+def talent_list(request):
+    profiles = UserProfile.objects.select_related('user').all()
+    return render(request, 'talent_list.html', {'profiles': profiles})
 
 #become an emploeyer
 @login_required

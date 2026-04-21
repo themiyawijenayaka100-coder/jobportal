@@ -11,30 +11,52 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
     <div class="container">
         <a class="navbar-brand" href="/">Job Portal</a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ms-auto">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="{% url 'job_list' %}">Find Jobs</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'talent_list' %}">Hire Talent</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Stories</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+            </ul>
+
+            <ul class="navbar-nav ms-auto align-items-lg-center">
                 {% if user.is_authenticated %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'job_list' %}">Jobs</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'my_applications' %}">My Applications</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'my_applications' %}">My Applications</a></li>
 
-                    {% if user.groups.all.0.name == 'Employer' %}
-                        <li class="nav-item"><a class="nav-link text-success" href="{% url 'create_job' %}">Post Job</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'employer_dashboard' %}">Employer Dashboard</a></li>
-                    {% else %}
-                        <li class="nav-item"><a class="nav-link text-warning fw-bold" href="{% url 'become_employer' %}">Become an Employer</a></li>
-                    {% endif %}
+                            {% if user.groups.all.0.name == 'Employer' %}
+                                <li><a class="dropdown-item text-success" href="{% url 'create_job' %}">Post Job</a></li>
+                                <li><a class="dropdown-item" href="{% url 'employer_dashboard' %}">Employer Dashboard</a></li>
+                            {% else %}
+                                <li><a class="dropdown-item text-warning fw-bold" href="{% url 'become_employer' %}">Become an Employer</a></li>
+                            {% endif %}
 
-                    <li class="nav-item">
-                        <form method="POST" action="{% url 'logout' %}" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn nav-link text-danger border-0 bg-transparent" style="cursor: pointer;">
-                                Logout
-                            </button>
-                        </form>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="POST" action="{% url 'logout' %}" class="px-3 py-1">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link text-danger p-0" style="text-decoration: none;">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
                     </li>
                 {% else %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
+                    <li class="nav-item me-lg-2 mb-2 mb-lg-0">
+                        <a class="btn btn-outline-light" href="{% url 'register' %}">Sign In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary" href="{% url 'login' %}">Login</a>
+                    </li>
                 {% endif %}
             </ul>
         </div>
