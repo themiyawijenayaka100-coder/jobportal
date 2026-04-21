@@ -49,11 +49,11 @@ def home(request):
 
 #become an emploeyer
 @login_required
-def become_employer(request):
+def become_an_employer(request):
     if request.method == 'POST':
         employer_group, created = Group.objects.get_or_create(name='Employer')
         request.user.groups.add(employer_group)
         return redirect('employer_dashboard')
     
     # If GET request, show the confirmation form
-    return render(request, 'become_employer.html')
+    return render(request, 'become_an_employer.html')
