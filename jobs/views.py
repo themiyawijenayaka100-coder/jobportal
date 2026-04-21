@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from .models import Job
 from django.shortcuts import get_object_or_404
 from applications.models import Application
@@ -8,6 +8,7 @@ from .forms import JobForm
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.views.decorators.http import require_POST
 
 # view all jobs
 def job_list(request):
@@ -115,14 +116,32 @@ def manage_job_applications(request, job_id):
     job = get_object_or_404(Job, id=job_id, created_by=request.user)
     applications = Application.objects.filter(job=job)
 
-    if request.method == 'POST':
-        app_id = request.POST.get('application_id')
-        new_status = request.POST.get('status')
-        
-        application = get_object_or_404(Application, id=app_id, job=job)
-        application.status = new_status
-        application.save()
-        
-        return redirect('manage_job_applications', job_id=job.id)
-
     return render(request, 'manage_applications.html', {'job': job, 'applications': applications})
+
+
+@login_required
+@require_POST
+def update_application_status(request):
+    app_id = request.POST.get("application_id")
+    new_status = request.POST.get("status")
+
+    if not app_id or not new_status:
+        return JsonResponse({"ok": False, "error": "Missing application_id or status."}, status=400)
+
+    application = get_object_or_404(
+        Application.objects.select_related("job"),
+        id=app_id,
+    )
+
+    # Security: only the job owner can update statuses
+    if application.job.created_by != request.user:
+        return JsonResponse({"ok": False, "error": "Forbidden."}, status=403)
+
+    valid_statuses = {choice[0] for choice in Application.STATUS_CHOICES}
+    if new_status not in valid_statuses:
+        return JsonResponse({"ok": False, "error": "Invalid status."}, status=400)
+
+    application.status = new_status
+    application.save(update_fields=["status"])
+
+    return JsonResponse({"ok": True, "application_id": application.id, "status": application.status})
