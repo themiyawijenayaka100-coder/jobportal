@@ -95,8 +95,20 @@ def employer_dashboard(request):
         return redirect('home')
     
     my_jobs = Job.objects.filter(created_by=request.user)
+    total_active_jobs = my_jobs.count()
+    total_pending_applications = Application.objects.filter(
+        job__created_by=request.user, status="Pending"
+    ).count()
     
-    return render(request, 'employer_dashboard.html', {'my_jobs': my_jobs})
+    return render(
+        request,
+        "employer_dashboard.html",
+        {
+            "my_jobs": my_jobs,
+            "total_active_jobs": total_active_jobs,
+            "total_pending_applications": total_pending_applications,
+        },
+    )
 
 @login_required
 def manage_job_applications(request, job_id):
