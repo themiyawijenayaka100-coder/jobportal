@@ -24,7 +24,14 @@
                         <li class="nav-item"><a class="nav-link text-warning fw-bold" href="{% url 'become_employer' %}">Become an Employer</a></li>
                     {% endif %}
 
-                    <li class="nav-item"><a class="nav-link text-danger" href="{% url 'logout' %}">Logout</a></li>
+                    <li class="nav-item">
+                        <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn nav-link text-danger border-0 bg-transparent" style="cursor: pointer;">
+                                Logout
+                            </button>
+                        </form>
+                    </li>
                 {% else %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
