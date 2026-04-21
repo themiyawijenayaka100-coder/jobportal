@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 
 #register
 def register(request):
@@ -39,6 +40,7 @@ def user_login(request):
     return render(request, 'login.html')
 
 #logout
+@require_POST
 def user_logout(request):
     logout(request)
     return redirect('home')
