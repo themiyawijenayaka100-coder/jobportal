@@ -18,11 +18,11 @@
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="{% url 'job_list' %}">Find Jobs</a></li>
-                {% if user.is_authenticated and user.groups.all.0.name == 'Employer' %}
+                {% if user.is_authenticated and user.groups.all and user.groups.all.0.name == 'Employer' %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'talent_list' %}">Hire Talent</a></li>
                 {% endif %}
-                <li class="nav-item"><a class="nav-link" href="#">Stories</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'story_list' %}">Stories</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'about_us' %}">About</a></li>
             </ul>
 
             <ul class="navbar-nav ms-auto align-items-lg-center">
@@ -36,7 +36,7 @@
                             <li><a class="dropdown-item" href="{% url 'inbox' %}">Inbox</a></li>
                             <li><a class="dropdown-item" href="{% url 'my_applications' %}">My Applications</a></li>
 
-                            {% if user.groups.all.0.name == 'Employer' %}
+                            {% if user.groups.all and user.groups.all.0.name == 'Employer' %}
                                 <li><a class="dropdown-item text-success" href="{% url 'create_job' %}">Post Job</a></li>
                                 <li><a class="dropdown-item" href="{% url 'employer_dashboard' %}">Employer Dashboard</a></li>
                             {% else %}

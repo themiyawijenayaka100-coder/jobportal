@@ -29,7 +29,14 @@ class RegisterForm(forms.ModelForm):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ["bio", "profile_picture", "resume_link", "skills"]
+        fields = [
+            "bio",
+            "skills",
+            "experience",
+            "education",
+            "resume_link",
+            "profile_picture",
+        ]
 
 
 class DirectMessageForm(forms.ModelForm):

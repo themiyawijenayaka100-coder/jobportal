@@ -7,9 +7,11 @@ from django.dispatch import receiver
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True)
+    skills = models.TextField(blank=True)
+    experience = models.TextField(blank=True)
+    education = models.TextField(blank=True)
     profile_picture = models.ImageField(upload_to="profile_pictures/", blank=True, null=True)
     resume_link = models.URLField(blank=True)
-    skills = models.CharField(max_length=255, blank=True)
 
     def __str__(self) -> str:
         return f"{self.user.username}'s profile"

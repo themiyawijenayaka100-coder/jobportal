@@ -4,9 +4,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib import messages
+from django.http import HttpResponseForbidden
 from .forms import RegisterForm, UserProfileForm, DirectMessageForm
 from django.contrib.auth.forms import AuthenticationForm
 from .models import UserProfile, DirectMessage
+from jobs.models import Job
+from applications.models import Application
 
 #register
 def register(request):
@@ -48,12 +51,67 @@ def user_logout(request):
 
 #home
 def home(request):
-    return render(request, 'home.html')
+    is_employer = (
+        request.user.is_authenticated
+        and request.user.groups.filter(name="Employer").exists()
+    )
+
+    context = {"is_employer": is_employer}
+
+    if request.user.is_authenticated:
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
+        if is_employer:
+            context.update(
+                {
+                    "active_jobs_count": Job.objects.filter(created_by=request.user).count(),
+                    "total_applications_count": Application.objects.filter(
+                        job__created_by=request.user
+                    ).count(),
+                }
+            )
+        else:
+            recommended_jobs = list(
+                Job.objects.exclude(created_by=request.user).order_by("-id")[:6]
+            )
+            status_by_job_id = dict(
+                Application.objects.filter(user=request.user).values_list("job_id", "status")
+            )
+            for job in recommended_jobs:
+                job.applied_status = status_by_job_id.get(job.id)
+
+            context.update(
+                {
+                    "profile": profile,
+                    "profile_incomplete": not (
+                        (profile.bio or "").strip()
+                        and (profile.skills or "").strip()
+                        and (profile.experience or "").strip()
+                        and (profile.education or "").strip()
+                    ),
+                    "recommended_jobs": recommended_jobs,
+                    "recent_applications": Application.objects.select_related("job")
+                    .filter(user=request.user)
+                    .order_by("-applied_date")[:5],
+                }
+            )
+
+    return render(request, "home.html", context)
 
 #hire talent directory
+@login_required
 def talent_list(request):
-    profiles = UserProfile.objects.select_related('user').all()
-    return render(request, 'talent_list.html', {'profiles': profiles})
+    if not request.user.groups.filter(name="Employer").exists():
+        return HttpResponseForbidden("Forbidden.")
+
+    # Only show non-employer profiles to employers
+    profiles = (
+        UserProfile.objects.select_related("user")
+        .exclude(user__groups__name="Employer")
+        .order_by("user__username")
+        .distinct()
+    )
+    return render(request, "talent_list.html", {"profiles": profiles})
 
 #become an emploeyer
 @login_required
@@ -83,8 +141,29 @@ def edit_profile(request):
 
 
 @login_required
+def profile_detail(request, user_id: int):
+    user_obj = get_object_or_404(User, pk=user_id)
+    profile, _ = UserProfile.objects.get_or_create(user=user_obj)
+    return render(
+        request,
+        "profile_detail.html",
+        {"profile": profile, "profile_user": user_obj},
+    )
+
+
+def about_us(request):
+    return render(request, "about.html")
+
+
+@login_required
 def send_message(request, recipient_id: int):
     recipient = get_object_or_404(User, pk=recipient_id)
+
+    if not request.user.groups.filter(name="Employer").exists():
+        return HttpResponseForbidden("Only employers can initiate messages.")
+
+    if recipient == request.user:
+        return HttpResponseForbidden("You can't message yourself.")
 
     if request.method == "POST":
         form = DirectMessageForm(request.POST)
