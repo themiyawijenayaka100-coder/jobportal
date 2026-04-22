@@ -31,6 +31,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{% url 'my_applications' %}">My Applications</a></li>
+                            <li><a class="dropdown-item" href="{% url 'edit_profile' %}">Edit Profile</a></li>
 
                             {% if user.groups.all.0.name == 'Employer' %}
                                 <li><a class="dropdown-item text-success" href="{% url 'create_job' %}">Post Job</a></li>
