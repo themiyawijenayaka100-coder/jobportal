@@ -108,3 +108,6 @@ def edit_profile(request):
         "profile_form": profile_form,
         "password_form": password_form,
     })
+
+def about(request):
+    return render(request, 'about.html')
