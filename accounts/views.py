@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import Group
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib import messages
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 
 from .forms import RegisterForm, UserProfileUpdateForm
 from .models import UserProfile
@@ -72,22 +72,39 @@ def become_an_employer(request):
     return render(request, 'become_an_employer.html')
 
 
-# edit profile
+# edit profile + change password
 @login_required
 def edit_profile(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
 
-    if request.method == "POST":
-        form = UserProfileUpdateForm(
-            request.POST,
-            instance=profile,
-            user=request.user
-        )
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Username updated successfully.")
-            return redirect("edit_profile")
-    else:
-        form = UserProfileUpdateForm(instance=profile, user=request.user)
+    profile_form = UserProfileUpdateForm(instance=profile, user=request.user)
+    password_form = PasswordChangeForm(request.user)
 
-    return render(request, "edit_profile.html", {"form": form})
+    if request.method == "POST":
+        if "save_profile" in request.POST:
+            profile_form = UserProfileUpdateForm(
+                request.POST,
+                instance=profile,
+                user=request.user
+            )
+            password_form = PasswordChangeForm(request.user)
+
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, "Username updated successfully.")
+                return redirect("edit_profile")
+
+        elif "change_password" in request.POST:
+            profile_form = UserProfileUpdateForm(instance=profile, user=request.user)
+            password_form = PasswordChangeForm(request.user, request.POST)
+
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, "Password updated successfully.")
+                return redirect("edit_profile")
+
+    return render(request, "edit_profile.html", {
+        "profile_form": profile_form,
+        "password_form": password_form,
+    })
