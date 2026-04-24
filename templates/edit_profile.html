@@ -1,12 +1,73 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+  /* Scoped to Edit Profile page only */
+  .edit-profile-page .ep-hero {
+    background: linear-gradient(135deg, rgba(34, 197, 94, .14), rgba(59, 130, 246, .14), rgba(168, 85, 247, .12));
+    border: 1px solid rgba(15, 23, 42, .06);
+  }
+  .edit-profile-page .ep-badge {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #22c55e, #60a5fa, #a855f7);
+    color: #0b1020;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 .6rem 1.4rem rgba(0, 0, 0, .16);
+  }
+  .edit-profile-page .ep-card {
+    border: 1px solid rgba(15, 23, 42, .08);
+    overflow: hidden;
+  }
+  .edit-profile-page .ep-card-header {
+    background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.84));
+    border-bottom: 1px solid rgba(15, 23, 42, .08);
+  }
+  .edit-profile-page .ep-input {
+    border-radius: 14px;
+    border: 1px solid rgba(15, 23, 42, .12);
+  }
+  .edit-profile-page .ep-input:focus {
+    border-color: rgba(99, 102, 241, .55);
+    box-shadow: 0 0 0 .25rem rgba(99, 102, 241, .18);
+  }
+  .edit-profile-page .ep-btn-primary {
+    background: linear-gradient(135deg, #2563eb, #a855f7);
+    border: none;
+  }
+  .edit-profile-page .ep-btn-primary:hover {
+    filter: brightness(1.03);
+  }
+  .edit-profile-page .ep-btn-dark {
+    background: linear-gradient(135deg, #111827, #334155);
+    border: none;
+  }
+  .edit-profile-page .ep-btn-dark:hover {
+    filter: brightness(1.05);
+  }
+</style>
+
+<div class="edit-profile-page">
 <div class="row justify-content-center">
     <div class="col-lg-8 col-xl-7">
 
-        <div class="card shadow-sm border-0 mb-4">
+        <div class="ep-hero rounded-4 p-4 p-md-5 shadow-sm mb-4">
+            <div class="d-flex align-items-start gap-3">
+                <div class="ep-badge" aria-hidden="true">
+                    <span style="font-size: 22px; line-height: 1;">👤</span>
+                </div>
+                <div>
+                    <h2 class="fw-bold mb-1">Edit Profile</h2>
+                    <div class="text-muted">Keep your information up to date.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card ep-card shadow-sm border-0 mb-4">
             <div class="card-body p-4 p-md-5">
-                <h2 class="fw-bold mb-4">Edit Profile</h2>
 
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
@@ -75,14 +136,14 @@
                         {% endif %}
                     </div>
 
-                    <button type="submit" name="save_profile" class="btn btn-primary w-100">
+                    <button type="submit" name="save_profile" class="btn ep-btn-primary text-white w-100 rounded-pill">
                         Save Profile
                     </button>
                 </form>
             </div>
         </div>
 
-        <div class="card shadow-sm border-0 mb-4">
+        <div class="card ep-card shadow-sm border-0 mb-4">
             <div class="card-body p-4 p-md-5">
                 <h3 class="fw-bold mb-4">Change Password</h3>
 
@@ -119,7 +180,7 @@
                         </div>
                     {% endif %}
 
-                    <button type="submit" name="change_password" class="btn btn-dark w-100">
+                    <button type="submit" name="change_password" class="btn ep-btn-dark text-white w-100 rounded-pill">
                         Update Password
                     </button>
                 </form>
@@ -136,8 +197,16 @@
         );
 
         passwordFields.forEach(function (field) {
-            field.classList.add("form-control");
+            field.classList.add("form-control", "ep-input");
+        });
+
+        const otherFields = document.querySelectorAll(
+            "input:not([type='password']), textarea, select"
+        );
+        otherFields.forEach(function (field) {
+            field.classList.add("form-control", "ep-input");
         });
     });
 </script>
+</div>
 {% endblock %}
