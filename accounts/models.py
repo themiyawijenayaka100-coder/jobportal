@@ -7,12 +7,43 @@ from django.dispatch import receiver
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True)
+    skills = models.TextField(blank=True)
+    experience = models.TextField(blank=True)
+    education = models.TextField(blank=True)
     profile_picture = models.ImageField(upload_to="profile_pictures/", blank=True, null=True)
     resume_link = models.URLField(blank=True)
-    skills = models.CharField(max_length=255, blank=True)
 
     def __str__(self) -> str:
         return f"{self.user.username}'s profile"
+
+
+class DirectMessage(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_messages")
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_messages")
+    subject = models.CharField(max_length=255)
+    body = models.TextField()
+    sent_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-sent_at"]
+
+    def __str__(self) -> str:
+        return f"From {self.sender.username} to {self.recipient.username}: {self.subject}"
+
+
+class Notification(models.Model):
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
+    message = models.CharField(max_length=255)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    link = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Notification to {self.recipient.username}: {self.message}"
 
 
 @receiver(post_save, sender=User)

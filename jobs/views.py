@@ -1,14 +1,15 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden, JsonResponse
-from .models import Job
+from .models import Job, Story
 from django.shortcuts import get_object_or_404
 from applications.models import Application
-from .forms import JobForm
+from .forms import JobForm, StoryForm
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
+from accounts.models import Notification
 
 # view all jobs
 def job_list(request):
@@ -58,7 +59,7 @@ def create_job(request):
 def edit_job(request, job_id):
     job = get_object_or_404(Job, id=job_id)
 
-    if job.created_by != request.user:
+    if job.employer != request.user:
         messages.error(request, "Access denied: you can only edit your own job posts.")
         return redirect("job_list")
 
@@ -78,7 +79,7 @@ def edit_job(request, job_id):
 def delete_job(request, job_id):
     job = get_object_or_404(Job, id=job_id)
 
-    if job.created_by != request.user:
+    if job.employer != request.user:
         messages.error(request, "Access denied: you can only delete your own job posts.")
         return redirect("job_list")
 
@@ -113,7 +114,11 @@ def employer_dashboard(request):
 
 @login_required
 def manage_job_applications(request, job_id):
-    job = get_object_or_404(Job, id=job_id, created_by=request.user)
+    job = get_object_or_404(Job, id=job_id)
+
+    if job.employer != request.user:
+        return HttpResponseForbidden("Forbidden.")
+
     applications = Application.objects.filter(job=job)
 
     return render(request, 'manage_applications.html', {'job': job, 'applications': applications})
@@ -134,14 +139,44 @@ def update_application_status(request):
     )
 
     # Security: only the job owner can update statuses
-    if application.job.created_by != request.user:
+    if application.job.employer != request.user:
         return JsonResponse({"ok": False, "error": "Forbidden."}, status=403)
 
     valid_statuses = {choice[0] for choice in Application.STATUS_CHOICES}
     if new_status not in valid_statuses:
         return JsonResponse({"ok": False, "error": "Invalid status."}, status=400)
 
+    old_status = application.status
     application.status = new_status
     application.save(update_fields=["status"])
 
+    if old_status != "Accepted" and new_status == "Accepted":
+        Notification.objects.create(
+            recipient=application.user,
+            message=f"Your application for {application.job.title} was accepted!",
+            link="/applications/my/",
+        )
+
     return JsonResponse({"ok": True, "application_id": application.id, "status": application.status})
+
+
+@login_required
+def story_list(request):
+    stories = Story.objects.select_related("author").all()
+    return render(request, "story_list.html", {"stories": stories})
+
+
+@login_required
+def create_story(request):
+    if request.method == "POST":
+        form = StoryForm(request.POST)
+        if form.is_valid():
+            story = form.save(commit=False)
+            story.author = request.user
+            story.save()
+            messages.success(request, "Story posted.")
+            return redirect("story_list")
+    else:
+        form = StoryForm()
+
+    return render(request, "create_story.html", {"form": form})

@@ -8,5 +8,7 @@ urlpatterns = [
     path('dashboard/', views.employer_dashboard, name='employer_dashboard'),
     path('<int:job_id>/applications/', views.manage_job_applications, name='manage_job_applications'),
     path('applications/update-status/', views.update_application_status, name='update_application_status'),
+    path("stories/", views.story_list, name="story_list"),
+    path("stories/create/", views.create_story, name="create_story"),
     path('', views.job_list, name='job_list'),
 ]

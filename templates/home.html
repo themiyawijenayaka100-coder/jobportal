@@ -1,49 +1,212 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="rounded-4 overflow-hidden shadow-sm border mb-5">
-    <div style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80') center/cover; padding: 5rem 2rem;">
-        <div class="container py-4">
-            <div class="row">
-                <div class="col-lg-8">
-                    <h1 class="display-4 fw-bold text-white mb-3">Find your next role. Hire your next star.</h1>
-                    <p class="lead text-white-50 mb-4">
-                        A simple job portal for candidates and employers—browse opportunities, showcase talent, and connect faster.
-                    </p>
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="{% url 'job_list' %}" class="btn btn-primary btn-lg px-4">Find Jobs</a>
-                        <a href="{% url 'talent_list' %}" class="btn btn-outline-light btn-lg px-4">Hire Talent</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+<style>
+  .home-hero {
+    padding: 5rem 2rem;
+    background-position: center;
+    background-size: cover;
+  }
+  .bg-employer {
+    background-image:
+      linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,.65)),
+      url('https://images.unsplash.com/photo-1521791055366-0d553872125f?auto=format&fit=crop&w=1920&q=80');
+  }
+  .bg-employee {
+    background-image:
+      linear-gradient(rgba(0,0,0,.65), rgba(0,0,0,.65)),
+      url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80');
+  }
+</style>
 
-<section class="bg-white rounded-4 shadow-sm border p-4 p-md-5">
-    <div class="row g-4 align-items-center">
-        <div class="col-lg-7">
-            <h2 class="fw-bold mb-3">About Job Portal</h2>
-            <p class="text-muted mb-3">
-                Job Portal helps job seekers discover roles and apply confidently, while employers can browse a growing directory of talent profiles.
-                Candidates can share a bio, skills, and profile picture so recruiters can quickly understand their strengths.
-            </p>
-            <p class="text-muted mb-0">
-                Whether you're looking for your next opportunity or searching for your next hire, we make it easy to explore, shortlist, and connect.
-            </p>
+{% if user.is_authenticated %}
+  <section class="rounded-4 overflow-hidden shadow-sm border mb-4">
+    <div class="home-hero {% if request.user.groups.all.0.name == 'Employer' %}bg-employer{% else %}bg-employee{% endif %}">
+      <div class="container py-2">
+        <div class="row">
+          <div class="col-lg-8">
+            {% if request.user.groups.all.0.name == 'Employer' %}
+              <h1 class="display-5 fw-bold text-white mb-2">Hire faster, with confidence</h1>
+              <p class="lead text-white-50 mb-0">Track postings, review applicants, and connect with talent.</p>
+            {% else %}
+              <h1 class="display-5 fw-bold text-white mb-2">Your next opportunity starts here</h1>
+              <p class="lead text-white-50 mb-0">Discover jobs, apply quickly, and track your application status.</p>
+            {% endif %}
+          </div>
         </div>
-        <div class="col-lg-5">
-            <div class="p-4 rounded-4 border bg-light">
-                <div class="d-grid gap-2">
-                    <a href="{% url 'job_list' %}" class="btn btn-dark btn-lg">Browse Jobs</a>
-                    <a href="{% url 'talent_list' %}" class="btn btn-outline-dark btn-lg">Browse Talent</a>
-                </div>
-                <hr class="my-4">
-                <p class="small text-muted mb-0">
-                    Tip: Create an account to apply for jobs and contact talent.
-                </p>
-            </div>
-        </div>
+      </div>
     </div>
-</section>
-{% endblock %} #End of content block
+  </section>
+
+  {% if is_employer %}
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+      <div>
+        <h1 class="fw-bold mb-1">Employer Home</h1>
+        <p class="text-muted mb-0">Quick overview of your hiring activity.</p>
+      </div>
+      <div class="d-flex gap-2">
+        <a class="btn btn-gradient-secondary rounded-pill px-4" href="{% url 'create_job' %}">+ Post a Job</a>
+        <a class="btn btn-outline-light rounded-pill px-4" href="{% url 'talent_list' %}">View Talent</a>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <div class="text-muted small">Active jobs</div>
+            <div class="display-6 fw-semibold">{{ active_jobs_count|default:0 }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="card shadow-sm h-100 border-start border-warning border-4">
+          <div class="card-body">
+            <div class="text-muted small">Total applications</div>
+            <div class="display-6 fw-semibold">{{ total_applications_count|default:0 }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-4">
+      <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+          <div class="fw-semibold">Next steps</div>
+          <div class="text-muted small">Post a role or browse candidates.</div>
+        </div>
+        <div class="d-flex gap-2">
+          <a class="btn btn-gradient-primary rounded-pill px-4" href="{% url 'employer_dashboard' %}">Open Dashboard</a>
+          <a class="btn btn-outline-secondary rounded-pill px-4" href="{% url 'job_list' %}">Browse Jobs</a>
+        </div>
+      </div>
+    </div>
+
+  {% else %}
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+      <div>
+        <h1 class="fw-bold mb-1">Welcome back</h1>
+        <p class="text-muted mb-0">Recommended jobs and your latest applications.</p>
+      </div>
+      <div class="d-flex gap-2">
+        <a class="btn btn-gradient-primary rounded-pill px-4" href="{% url 'job_list' %}">Find Jobs</a>
+        <a class="btn btn-outline-secondary rounded-pill px-4" href="{% url 'my_applications' %}">My Applications</a>
+      </div>
+    </div>
+
+    {% if profile_incomplete %}
+      <div class="alert alert-warning shadow-sm">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <div>
+            <div class="fw-semibold">Complete your profile</div>
+            <div class="small">Add your skills, experience, and education to generate a stronger CV-style profile.</div>
+          </div>
+          <a class="btn btn-sm btn-dark" href="{% url 'edit_profile' %}">Complete Profile</a>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="row g-4">
+      <div class="col-12 col-lg-7">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <div class="fw-semibold">Recommended jobs</div>
+            <a class="small text-decoration-none" href="{% url 'job_list' %}">See all</a>
+          </div>
+          <div class="list-group list-group-flush">
+            {% for job in recommended_jobs %}
+              <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                  <div class="min-w-0">
+                    <div class="fw-semibold text-truncate">{{ job.title }}</div>
+                    <div class="text-muted small text-truncate">{{ job.company }}</div>
+                  </div>
+                  <div class="text-end">
+                    {% if job.applied_status %}
+                      <span class="badge text-bg-secondary">Applied: {{ job.applied_status }}</span>
+                    {% else %}
+                      <a class="btn btn-sm btn-gradient-primary rounded-pill px-3" href="{% url 'apply_job' job.id %}">Apply</a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="list-group-item text-muted">No recommendations yet.</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-5">
+        <div class="card shadow-sm border-0 rounded-4 h-100">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <div class="fw-semibold">Recent applications</div>
+            <a class="small text-decoration-none" href="{% url 'my_applications' %}">View all</a>
+          </div>
+          <div class="list-group list-group-flush">
+            {% for app in recent_applications %}
+              <div class="list-group-item">
+                <div class="fw-semibold">{{ app.job.title }}</div>
+                <div class="text-muted small">{{ app.job.company }}</div>
+                <div class="mt-2">
+                  <span class="badge {% if app.status == 'Pending' %}text-bg-warning{% elif app.status == 'Accepted' %}text-bg-success{% else %}text-bg-danger{% endif %}">
+                    {{ app.status }}
+                  </span>
+                </div>
+              </div>
+            {% empty %}
+              <div class="list-group-item text-muted">No applications yet.</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+{% else %}
+  <section class="rounded-4 overflow-hidden shadow-sm border mb-5">
+      <div class="home-hero bg-employee">
+          <div class="container py-4">
+              <div class="row">
+                  <div class="col-lg-8">
+                      <h1 class="display-4 fw-bold text-white mb-3">Find work fast. Hire with confidence.</h1>
+                      <p class="lead text-white-50 mb-4">
+                          A secure job portal built for blue-collar and entry-level opportunities.
+                      </p>
+                      <div class="d-flex flex-wrap gap-2">
+                          <a href="{% url 'job_list' %}" class="btn btn-gradient-primary rounded-pill btn-lg px-4">Browse Jobs</a>
+                          <a href="{% url 'register' %}" class="btn btn-outline-light rounded-pill btn-lg px-4">Create Account</a>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <section class="bg-white rounded-4 shadow-sm border p-4 p-md-5">
+      <div class="row g-4 align-items-center">
+          <div class="col-lg-7">
+              <h2 class="fw-bold mb-3">Built for real work</h2>
+              <p class="text-muted mb-3">
+                  We help job seekers showcase practical skills and experience, and help employers connect with the right people—without leaking personal data or enabling unsafe messaging.
+              </p>
+              <p class="text-muted mb-0">
+                  Sign up to apply, track your applications, and build a CV-style profile you can share with employers.
+              </p>
+          </div>
+          <div class="col-lg-5">
+              <div class="p-4 rounded-4 border bg-light">
+                  <div class="d-grid gap-2">
+                      <a href="{% url 'job_list' %}" class="btn btn-dark btn-lg">Browse Jobs</a>
+                      <a href="{% url 'login' %}" class="btn btn-outline-dark btn-lg">Login</a>
+                  </div>
+                  <hr class="my-4">
+                  <p class="small text-muted mb-0">
+                      Employers can post jobs and view talent after upgrading to an Employer account.
+                  </p>
+              </div>
+          </div>
+      </div>
+  </section>
+{% endif %}
+{% endblock %}
