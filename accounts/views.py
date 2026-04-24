@@ -12,6 +12,11 @@ from .models import UserProfile, DirectMessage
 from .models import Notification
 from jobs.models import Job
 from applications.models import Application
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+
 
 
 # register
@@ -133,17 +138,41 @@ def become_an_employer(request):
 
 @login_required
 def edit_profile(request):
-    profile = request.user.profile
-    if request.method == "POST":
-        form = UserProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Profile updated successfully.")
-            return redirect("profile_detail", user_id=request.user.id)
-    else:
-        form = UserProfileForm(instance=profile)
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
 
-    return render(request, "edit_profile.html", {"form": form, "profile": profile})
+    profile_form = UserProfileForm(instance=profile, user=request.user)
+    password_form = PasswordChangeForm(request.user)
+
+    if request.method == "POST":
+        if "save_profile" in request.POST:
+            profile_form = UserProfileForm(
+                request.POST,
+                request.FILES,
+                instance=profile,
+                user=request.user
+            )
+            password_form = PasswordChangeForm(request.user)
+
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, "Profile updated successfully.")
+                return redirect("edit_profile")
+
+        elif "change_password" in request.POST:
+            profile_form = UserProfileForm(instance=profile, user=request.user)
+            password_form = PasswordChangeForm(request.user, request.POST)
+
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, "Password updated successfully.")
+                return redirect("edit_profile")
+
+    return render(request, "edit_profile.html", {
+        "profile_form": profile_form,
+        "password_form": password_form,
+        "profile": profile,
+    })
 
 
 @login_required
