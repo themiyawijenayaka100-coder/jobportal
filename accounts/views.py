@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.http import HttpResponseForbidden
+from django.http import JsonResponse
 from .forms import RegisterForm, UserProfileForm, DirectMessageForm
 from django.contrib.auth.forms import AuthenticationForm
 from .models import UserProfile, DirectMessage
@@ -200,3 +201,23 @@ def send_message(request, recipient_id: int):
 def inbox(request):
     inbox_messages = DirectMessage.objects.select_related("sender", "recipient").filter(recipient=request.user)
     return render(request, "inbox.html", {"inbox_messages": inbox_messages})
+
+
+@login_required
+@require_POST
+def mark_message_read(request, message_id: int):
+    message_obj = get_object_or_404(DirectMessage, pk=message_id, recipient=request.user)
+    if not message_obj.is_read:
+        message_obj.is_read = True
+        message_obj.save(update_fields=["is_read"])
+    return JsonResponse({"ok": True, "message_id": message_obj.id})
+
+
+@login_required
+@require_POST
+def delete_account(request):
+    user_obj = request.user
+    logout(request)
+    user_obj.delete()
+    messages.success(request, "Your account has been deleted.")
+    return redirect("home")

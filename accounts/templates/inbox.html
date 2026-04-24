@@ -24,10 +24,27 @@
         </thead>
         <tbody>
           {% for message in inbox_messages %}
-            <tr class="{% if not message.is_read %}table-warning{% endif %}">
+            <tr class="{% if not message.is_read %}table-warning{% endif %}" data-message-row="{{ message.id }}">
               <td class="fw-semibold">{{ message.sender.get_full_name|default:message.sender.username }}</td>
               <td>
-                <div class="fw-semibold">{{ message.subject }}</div>
+                <div class="d-flex align-items-start justify-content-between gap-2">
+                  <div class="fw-semibold">
+                    {{ message.subject }}
+                    {% if not message.is_read %}
+                      <span class="badge text-bg-primary ms-2" data-unread-badge="{{ message.id }}">New</span>
+                    {% endif %}
+                  </div>
+                  {% if not message.is_read %}
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-primary"
+                      data-mark-read-btn="{{ message.id }}"
+                      data-mark-read-url="{% url 'mark_message_read' message.id %}"
+                    >
+                      Mark read
+                    </button>
+                  {% endif %}
+                </div>
                 <div class="text-muted small" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                   {{ message.body }}
                 </div>
@@ -44,5 +61,47 @@
     </div>
   </div>
 </div>
+
+<script>
+  (function () {
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    }
+
+    async function markRead(btn) {
+      const url = btn.getAttribute("data-mark-read-url");
+      const messageId = btn.getAttribute("data-mark-read-btn");
+      const csrftoken = getCookie("csrftoken");
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrftoken,
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      });
+
+      if (!res.ok) return;
+
+      const row = document.querySelector(`[data-message-row="${messageId}"]`);
+      if (row) row.classList.remove("table-warning");
+
+      const badge = document.querySelector(`[data-unread-badge="${messageId}"]`);
+      if (badge) badge.remove();
+
+      btn.remove();
+    }
+
+    document.addEventListener("click", function (e) {
+      const btn = e.target.closest("[data-mark-read-btn]");
+      if (!btn) return;
+      e.preventDefault();
+      markRead(btn);
+    });
+  })();
+</script>
 {% endblock %}
 

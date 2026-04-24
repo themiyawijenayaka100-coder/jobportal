@@ -11,6 +11,7 @@ class UserProfile(models.Model):
     experience = models.TextField(blank=True)
     education = models.TextField(blank=True)
     profile_picture = models.ImageField(upload_to="profile_pictures/", blank=True, null=True)
+    cv_file = models.FileField(upload_to="cvs/", blank=True, null=True)
     resume_link = models.URLField(blank=True)
 
     def __str__(self) -> str:

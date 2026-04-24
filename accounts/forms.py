@@ -36,6 +36,7 @@ class UserProfileForm(forms.ModelForm):
             "education",
             "resume_link",
             "profile_picture",
+            "cv_file",
         ]
 
 

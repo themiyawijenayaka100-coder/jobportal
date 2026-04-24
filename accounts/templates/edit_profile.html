@@ -21,6 +21,19 @@
             <a href="{% url 'profile_detail' user.id %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
           </div>
         </form>
+
+        <hr class="my-4">
+
+        <form
+          method="post"
+          action="{% url 'delete_account' %}"
+          onsubmit="return confirm('Delete your account permanently? This cannot be undone.');"
+        >
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-danger rounded-pill">
+            Delete Account
+          </button>
+        </form>
       </div>
     </div>
   </div>

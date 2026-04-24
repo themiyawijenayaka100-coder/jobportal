@@ -19,6 +19,11 @@
             Resume Link
           </a>
         {% endif %}
+        {% if profile.cv_file %}
+          <a class="btn btn-outline-primary" href="{{ profile.cv_file.url }}" target="_blank" rel="noopener noreferrer">
+            View CV
+          </a>
+        {% endif %}
       </div>
     </div>
 

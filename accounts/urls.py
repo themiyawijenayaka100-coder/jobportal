@@ -14,4 +14,6 @@ urlpatterns = [
     path("notifications/", views.notifications_list, name="notifications_list"),
     path("messages/inbox/", views.inbox, name="inbox"),
     path("messages/send/<int:recipient_id>/", views.send_message, name="send_message"),
+    path("messages/<int:message_id>/read/", views.mark_message_read, name="mark_message_read"),
+    path("account/delete/", views.delete_account, name="delete_account"),
 ]
