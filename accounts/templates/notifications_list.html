@@ -22,6 +22,19 @@
     border-left-color: #6366f1;
     background: linear-gradient(90deg, rgba(99, 102, 241, .10), rgba(59, 130, 246, .04), transparent 55%);
   }
+  .notif-page .notif-item {
+    padding-top: .95rem;
+    padding-bottom: .95rem;
+  }
+  .notif-page .notif-body {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .notif-page .notif-text {
+    line-height: 1.35;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
   .notif-page .notif-dot {
     width: 10px;
     height: 10px;
@@ -29,6 +42,9 @@
     flex: 0 0 10px;
     background: #94a3b8;
     box-shadow: 0 0 0 3px rgba(148, 163, 184, .18);
+  }
+  .notif-page .notif-dot {
+    margin-top: .35rem !important;
   }
   .notif-page .notif-item.is-unread .notif-dot {
     background: linear-gradient(135deg, #60a5fa, #a855f7);
@@ -67,8 +83,8 @@
              href="{{ n.link }}">
             <div class="d-flex align-items-start gap-3 min-w-0">
               <div class="notif-dot mt-1" aria-hidden="true"></div>
-              <div class="min-w-0">
-                <div class="fw-semibold text-truncate {% if not n.is_read %}text-dark{% endif %}">{{ n.message }}</div>
+              <div class="notif-body">
+                <div class="fw-semibold notif-text {% if not n.is_read %}text-dark{% endif %}">{{ n.message }}</div>
                 <div class="text-muted small">{{ n.created_at|date:"M d, Y H:i" }}</div>
               </div>
             </div>
@@ -80,8 +96,8 @@
           <div class="list-group-item d-flex justify-content-between align-items-start gap-3 notif-item {% if not n.is_read %}is-unread{% endif %}">
             <div class="d-flex align-items-start gap-3 min-w-0">
               <div class="notif-dot mt-1" aria-hidden="true"></div>
-              <div class="min-w-0">
-                <div class="fw-semibold text-truncate {% if not n.is_read %}text-dark{% endif %}">{{ n.message }}</div>
+              <div class="notif-body">
+                <div class="fw-semibold notif-text {% if not n.is_read %}text-dark{% endif %}">{{ n.message }}</div>
                 <div class="text-muted small">{{ n.created_at|date:"M d, Y H:i" }}</div>
               </div>
             </div>

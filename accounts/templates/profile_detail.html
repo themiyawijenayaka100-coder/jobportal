@@ -1,79 +1,174 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-12 col-lg-9 col-xl-8">
-    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
-      <div>
-        <h1 class="fw-bold mb-1">
-          {{ profile_user.get_full_name|default:profile_user.username }}
-        </h1>
-        <div class="text-muted">@{{ profile_user.username }}</div>
-      </div>
-      <div class="d-flex gap-2">
-        {% if request.user.id == profile_user.id %}
-          <a class="btn btn-primary" href="{% url 'edit_profile' %}">Edit Profile</a>
-        {% endif %}
-        {% if profile.resume_link %}
-          <a class="btn btn-outline-secondary" href="{{ profile.resume_link }}" target="_blank" rel="noopener noreferrer">
-            Resume Link
-          </a>
-        {% endif %}
-        {% if profile.cv_file %}
-          <a class="btn btn-outline-primary" href="{{ profile.cv_file.url }}" target="_blank" rel="noopener noreferrer">
-            View CV
-          </a>
-        {% endif %}
-      </div>
-    </div>
+<style>
+  /* Scoped to Profile page only */
+  .profile-page .profile-hero {
+    background: linear-gradient(135deg, rgba(34, 197, 94, .14), rgba(59, 130, 246, .14), rgba(168, 85, 247, .12));
+    border: 1px solid rgba(15, 23, 42, .06);
+  }
+  .profile-page .profile-card {
+    border: 1px solid rgba(15, 23, 42, .06);
+  }
+  .profile-page .profile-avatar {
+    box-shadow: 0 .5rem 1.25rem rgba(0, 0, 0, .12);
+  }
+  .profile-page .profile-avatar-fallback {
+    background: linear-gradient(135deg, rgba(96, 165, 250, .18), rgba(168, 85, 247, .14));
+  }
+  .profile-page .section-title {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    font-weight: 800;
+    letter-spacing: .2px;
+  }
+  .profile-page .section-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #0b1020;
+  }
+  .profile-page .section-surface {
+    position: relative;
+    background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.82));
+    border: 1px solid rgba(15, 23, 42, .10);
+    box-shadow: 0 .4rem 1rem rgba(0,0,0,.06);
+    line-height: 1.6;
+    color: #0f172a;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    padding: 1rem;
+    padding-left: 1.85rem; /* room for accent bar */
+  }
+  .profile-page .section-surface::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 6px;
+    border-radius: 999px;
+    background: var(--section-accent, linear-gradient(135deg, rgba(96,165,250,.6), rgba(168,85,247,.45)));
+    opacity: .9;
+  }
+  .profile-page .section-surface .text-muted {
+    color: rgba(15, 23, 42, .72) !important;
+  }
+  .profile-page .section-surface:focus-within,
+  .profile-page .section-surface:hover {
+    box-shadow: 0 .55rem 1.2rem rgba(0,0,0,.08);
+    transform: translateY(-1px);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .profile-page .btn-profile-primary {
+    background: linear-gradient(135deg, #2563eb, #a855f7);
+    border: none;
+  }
+  .profile-page .btn-profile-primary:hover {
+    filter: brightness(1.03);
+  }
+  .profile-page .btn-profile-secondary {
+    background: linear-gradient(135deg, rgba(34, 197, 94, .18), rgba(14, 165, 233, .18));
+    border: 1px solid rgba(15, 23, 42, .10);
+  }
+</style>
 
-    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
-      <div class="card-body">
-        <div class="d-flex align-items-start gap-3 mb-4">
-          {% if profile.profile_picture %}
-            <img src="{{ profile.profile_picture.url }}" alt="{{ profile_user.username }}" class="rounded-3 border" style="width: 96px; height: 96px; object-fit: cover;">
-          {% else %}
-            <div class="rounded-3 bg-light border d-flex align-items-center justify-content-center text-muted fw-bold" style="width: 96px; height: 96px;">
-              {{ profile_user.username|slice:":1"|upper }}
-            </div>
-          {% endif %}
-
-          <div class="flex-grow-1">
-            <div class="text-muted small">Profile</div>
-            {% if profile.bio %}
-              <div class="mt-1">{{ profile.bio|linebreaksbr }}</div>
-            {% else %}
-              <div class="mt-1 text-muted">No bio provided yet.</div>
+<div class="profile-page">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-9 col-xl-8">
+      <div class="profile-hero rounded-4 p-4 p-md-5 shadow-sm mb-3">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+          <div>
+            <h1 class="fw-bold mb-1">
+              {{ profile_user.get_full_name|default:profile_user.username }}
+            </h1>
+            <div class="text-muted">@{{ profile_user.username }}</div>
+          </div>
+          <div class="d-flex gap-2 flex-wrap">
+            {% if request.user.id == profile_user.id %}
+              <a class="btn btn-profile-primary text-white" href="{% url 'edit_profile' %}">Edit Profile</a>
+            {% endif %}
+            {% if profile.resume_link %}
+              <a class="btn btn-profile-secondary" href="{{ profile.resume_link }}" target="_blank" rel="noopener noreferrer">
+                Resume Link
+              </a>
+            {% endif %}
+            {% if profile.cv_file %}
+              <a class="btn btn-outline-primary" href="{{ profile.cv_file.url }}" target="_blank" rel="noopener noreferrer">
+                View CV
+              </a>
             {% endif %}
           </div>
         </div>
+      </div>
 
-        <div class="row g-4">
-          <div class="col-12">
-            <div class="text-muted small mb-1">Skills</div>
-            {% if profile.skills %}
-              <div class="bg-light border rounded-3 p-3">{{ profile.skills|linebreaksbr }}</div>
+      <div class="card profile-card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="card-body">
+          <div class="d-flex align-items-start gap-3 mb-4">
+            {% if profile.profile_picture %}
+              <img src="{{ profile.profile_picture.url }}" alt="{{ profile_user.username }}" class="rounded-3 border profile-avatar" style="width: 96px; height: 96px; object-fit: cover;">
             {% else %}
-              <div class="text-muted">No skills listed.</div>
+              <div class="rounded-3 border d-flex align-items-center justify-content-center text-dark fw-bold profile-avatar profile-avatar-fallback" style="width: 96px; height: 96px;">
+                {{ profile_user.username|slice:":1"|upper }}
+              </div>
             {% endif %}
+
+            <div class="flex-grow-1">
+              <div class="text-muted small">Profile</div>
+              {% if profile.bio %}
+                <div class="mt-1">{{ profile.bio|linebreaksbr }}</div>
+              {% else %}
+                <div class="mt-1 text-muted">No bio provided yet.</div>
+              {% endif %}
+            </div>
           </div>
 
-          <div class="col-12">
-            <div class="text-muted small mb-1">Experience</div>
-            {% if profile.experience %}
-              <div class="bg-light border rounded-3 p-3">{{ profile.experience|linebreaksbr }}</div>
-            {% else %}
-              <div class="text-muted">No experience added.</div>
-            {% endif %}
-          </div>
+          <div class="row g-4">
+            <div class="col-12">
+              <div class="text-muted small mb-1 section-title">
+                <span class="section-icon" style="background:linear-gradient(135deg, rgba(34,197,94,.28), rgba(14,165,233,.22));" aria-hidden="true">★</span>
+                Skills
+              </div>
+              {% if profile.skills %}
+                <div class="section-surface rounded-3" style="--section-accent: linear-gradient(135deg, rgba(34,197,94,.70), rgba(14,165,233,.55));">
+                  {{ profile.skills|linebreaksbr }}
+                </div>
+              {% else %}
+                <div class="text-muted">No skills listed.</div>
+              {% endif %}
+            </div>
 
-          <div class="col-12">
-            <div class="text-muted small mb-1">Education</div>
-            {% if profile.education %}
-              <div class="bg-light border rounded-3 p-3">{{ profile.education|linebreaksbr }}</div>
-            {% else %}
-              <div class="text-muted">No education added.</div>
-            {% endif %}
+            <div class="col-12">
+              <div class="text-muted small mb-1 section-title">
+                <span class="section-icon" style="background:linear-gradient(135deg, rgba(96,165,250,.30), rgba(168,85,247,.22));" aria-hidden="true">⚡</span>
+                Experience
+              </div>
+              {% if profile.experience %}
+                <div class="section-surface rounded-3" style="--section-accent: linear-gradient(135deg, rgba(96,165,250,.75), rgba(168,85,247,.55));">
+                  {{ profile.experience|linebreaksbr }}
+                </div>
+              {% else %}
+                <div class="text-muted">No experience added.</div>
+              {% endif %}
+            </div>
+
+            <div class="col-12">
+              <div class="text-muted small mb-1 section-title">
+                <span class="section-icon" style="background:linear-gradient(135deg, rgba(251,146,60,.28), rgba(244,63,94,.18));" aria-hidden="true">🎓</span>
+                Education
+              </div>
+              {% if profile.education %}
+                <div class="section-surface rounded-3" style="--section-accent: linear-gradient(135deg, rgba(251,146,60,.75), rgba(244,63,94,.50));">
+                  {{ profile.education|linebreaksbr }}
+                </div>
+              {% else %}
+                <div class="text-muted">No education added.</div>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>
