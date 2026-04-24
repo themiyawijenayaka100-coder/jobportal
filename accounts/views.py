@@ -12,7 +12,8 @@ from .models import Notification
 from jobs.models import Job
 from applications.models import Application
 
-#register
+
+# register
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
@@ -23,7 +24,6 @@ def register(request):
 
         error = next(iter(form.errors.get("__all__", [])), None)
         if error is None:
-            # Prefer username/password field errors if present
             error = next(
                 iter(form.errors.get("username", []) or form.errors.get("password", []) or []),
                 "Please correct the errors below.",
@@ -32,7 +32,8 @@ def register(request):
 
     return render(request, 'register.html', {"form": RegisterForm()})
 
-#login
+
+# login
 def user_login(request):
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
@@ -43,14 +44,16 @@ def user_login(request):
 
     return render(request, "login.html", {"form": AuthenticationForm(request)})
 
-#logout
+
+# logout
 @require_POST
 def user_logout(request):
     logout(request)
     messages.success(request, "You have been successfully logged out.")
     return redirect('home')
 
-#home
+
+# home
 def home(request):
     is_employer = (
         request.user.is_authenticated
@@ -114,7 +117,8 @@ def talent_list(request):
     )
     return render(request, "talent_list.html", {"profiles": profiles})
 
-#become an emploeyer
+
+# become an employer
 @login_required
 def become_an_employer(request):
     if request.method == 'POST':

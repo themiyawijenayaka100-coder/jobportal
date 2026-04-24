@@ -1,19 +1,35 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-12 col-lg-9 col-xl-8">
-    <div class="p-4 p-md-5 bg-white rounded-4 shadow-sm border">
-      <h1 class="fw-bold mb-3">About Us</h1>
-      <p class="text-muted mb-3">
-        Job Portal’s mission is to connect blue-collar and entry-level workers with employers—securely and fairly.
-        We focus on practical skills, clear job information, and safer communication between employers and candidates.
-      </p>
-      <p class="text-muted mb-0">
-        This platform helps candidates build a CV-style profile and track applications, while employers can post jobs, review applicants, and reach out to talent in a controlled way.
-      </p>
-    </div>
-  </div>
-</div>
-{% endblock %}
+<section class="bg-white rounded-4 shadow-sm border p-4 p-md-5">
+    <div class="row g-4 align-items-center">
+        <div class="col-lg-7">
+            <h2 class="fw-bold mb-3">About Job Portal</h2>
 
+            <p class="text-muted mb-3">
+                Job Portal is a simple web application built using Django that connects job seekers with employers.
+            </p>
+
+            <p class="text-muted mb-3">
+                Users can register, browse jobs, and showcase their profiles, while employers can post opportunities and find suitable candidates.
+            </p>
+
+            <p class="text-muted mb-0">
+                This project demonstrates core web development concepts including authentication, role-based access, and CRUD operations.
+            </p>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="p-4 rounded-4 border bg-light">
+                <h5 class="fw-bold mb-3">Features</h5>
+                <ul class="text-muted">
+                    <li>User registration & login</li>
+                    <li>Edit profile & change password</li>
+                    <li>Job listing & applications</li>
+                    <li>Talent directory</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
