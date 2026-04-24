@@ -17,8 +17,8 @@
           {% csrf_token %}
           {{ form|crispy }}
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">Save changes</button>
-            <a href="{% url 'home' %}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-gradient-primary rounded-pill px-4">Save changes</button>
+            <a href="{% url 'profile_detail' user.id %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
           </div>
         </form>
       </div>

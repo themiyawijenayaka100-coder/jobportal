@@ -8,6 +8,7 @@ from django.http import HttpResponseForbidden
 from .forms import RegisterForm, UserProfileForm, DirectMessageForm
 from django.contrib.auth.forms import AuthenticationForm
 from .models import UserProfile, DirectMessage
+from .models import Notification
 from jobs.models import Job
 from applications.models import Application
 
@@ -133,7 +134,7 @@ def edit_profile(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Profile updated successfully.")
-            return redirect("edit_profile")
+            return redirect("profile_detail", user_id=request.user.id)
     else:
         form = UserProfileForm(instance=profile)
 
@@ -153,6 +154,13 @@ def profile_detail(request, user_id: int):
 
 def about_us(request):
     return render(request, "about.html")
+
+
+@login_required
+def notifications_list(request):
+    notifications = Notification.objects.filter(recipient=request.user).order_by("-created_at")
+    notifications.filter(is_read=False).update(is_read=True)
+    return render(request, "notifications_list.html", {"notifications": notifications})
 
 
 @login_required

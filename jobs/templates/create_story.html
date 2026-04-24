@@ -18,8 +18,8 @@
           {% csrf_token %}
           {{ form|crispy }}
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">Post Story</button>
-            <a class="btn btn-outline-secondary" href="{% url 'story_list' %}">Cancel</a>
+            <button type="submit" class="btn btn-gradient-primary rounded-pill px-4">Post Story</button>
+            <a class="btn btn-outline-secondary rounded-pill px-4" href="{% url 'story_list' %}">Cancel</a>
           </div>
         </form>
       </div>

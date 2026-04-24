@@ -8,8 +8,13 @@
     </div>
     <div class="card-body">
         {% for app in applications %}
-            <div class="border p-3 mb-3 rounded bg-light">
-                <p><b>Candidate:</b> {{ app.user.username }}</p>
+            <div class="border-0 p-4 mb-3 rounded-4 bg-light shadow-sm">
+                <p class="mb-2">
+                  <b>Candidate:</b>
+                  <a class="text-decoration-none" href="{% url 'profile_detail' app.user.id %}">
+                    {{ app.user.get_full_name|default:app.user.username }}
+                  </a>
+                </p>
                 <p class="mb-2">
                     <b>Status:</b>
                     <span
@@ -28,7 +33,7 @@
                         <option value="Accepted" {% if app.status == 'Accepted' %}selected{% endif %}>Accepted</option>
                         <option value="Rejected" {% if app.status == 'Rejected' %}selected{% endif %}>Rejected</option>
                     </select>
-                    <button type="submit" class="btn btn-primary btn-sm">Update Status</button>
+                    <button type="submit" class="btn btn-gradient-primary rounded-pill btn-sm px-3">Update Status</button>
                     <span class="small text-muted ms-2 d-none" id="status-saving-{{ app.id }}">Saving…</span>
                 </form>
             </div>

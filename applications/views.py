@@ -5,6 +5,7 @@ from django.http import HttpResponseForbidden
 from django.views.decorators.http import require_POST
 from .models import Application
 from jobs.models import Job
+from accounts.models import Notification
 
 @login_required
 def apply_job(request, job_id):
@@ -18,6 +19,12 @@ def apply_job(request, job_id):
     application, created = Application.objects.get_or_create(user=request.user, job=job)
     if created:
         messages.success(request, "Application submitted.")
+        applicant_name = request.user.get_full_name() or request.user.username
+        Notification.objects.create(
+            recipient=job.employer,
+            message=f"{applicant_name} applied for {job.title}",
+            link=f"/jobs/{job.id}/applications/",
+        )
     else:
         messages.info(request, "You have already applied for this job.")
 

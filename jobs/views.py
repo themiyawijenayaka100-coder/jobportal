@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
+from accounts.models import Notification
 
 # view all jobs
 def job_list(request):
@@ -145,8 +146,16 @@ def update_application_status(request):
     if new_status not in valid_statuses:
         return JsonResponse({"ok": False, "error": "Invalid status."}, status=400)
 
+    old_status = application.status
     application.status = new_status
     application.save(update_fields=["status"])
+
+    if old_status != "Accepted" and new_status == "Accepted":
+        Notification.objects.create(
+            recipient=application.user,
+            message=f"Your application for {application.job.title} was accepted!",
+            link="/applications/my/",
+        )
 
     return JsonResponse({"ok": True, "application_id": application.id, "status": application.status})
 
