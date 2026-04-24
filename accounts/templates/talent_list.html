@@ -1,80 +1,141 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
-    <div>
-        <h1 class="fw-bold mb-1">Hire Talent</h1>
-        <p class="text-muted mb-0">Browse candidate profiles and connect with the right people faster.</p>
-    </div>
-    <div class="small text-muted">
+<style>
+  /* Scoped to Hire Talent page only */
+  .talent-page .talent-hero {
+    background: linear-gradient(135deg, rgba(34, 197, 94, .14), rgba(59, 130, 246, .14), rgba(168, 85, 247, .12));
+    border: 1px solid rgba(15, 23, 42, .06);
+  }
+  .talent-page .talent-badge {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #22c55e, #60a5fa, #a855f7);
+    color: #0b1020;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 .6rem 1.4rem rgba(0, 0, 0, .16);
+  }
+  .talent-page .talent-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(15, 23, 42, .06);
+  }
+  .talent-page .talent-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(34,197,94,.12), rgba(96,165,250,.12), rgba(168,85,247,.10));
+    opacity: .95;
+    mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+    -webkit-mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+    padding: 1px;
+    border-radius: 1.25rem;
+  }
+  .talent-page .talent-avatar {
+    box-shadow: 0 .45rem 1.1rem rgba(0, 0, 0, .12);
+  }
+  .talent-page .talent-avatar-fallback {
+    background: linear-gradient(135deg, rgba(96, 165, 250, .18), rgba(168, 85, 247, .14));
+  }
+  .talent-page .skill-pill {
+    background: linear-gradient(135deg, rgba(96,165,250,.20), rgba(168,85,247,.14));
+    border: 1px solid rgba(15, 23, 42, .08);
+    color: rgba(15, 23, 42, .78);
+    font-weight: 700;
+  }
+  .talent-page .count-chip {
+    background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.78));
+    border: 1px solid rgba(15, 23, 42, .08);
+  }
+</style>
+
+<div class="talent-page">
+  <div class="talent-hero rounded-4 p-4 p-md-5 shadow-sm mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+      <div class="d-flex align-items-start gap-3">
+        <div class="talent-badge" aria-hidden="true">
+          <span style="font-size: 22px; line-height: 1;">🧑‍💻</span>
+        </div>
+        <div>
+          <h1 class="fw-bold mb-1">Hire Talent</h1>
+          <p class="text-muted mb-0">Browse candidate profiles and connect with the right people faster.</p>
+        </div>
+      </div>
+      <div class="small text-muted px-3 py-2 rounded-pill count-chip">
         {{ profiles|length }} profile{{ profiles|length|pluralize }}
+      </div>
     </div>
-</div>
+  </div>
 
-<div class="row g-4">
-    {% for profile in profiles %}
-        <div class="col-12 col-sm-6 col-lg-4">
-            <div class="card h-100 shadow-sm border-0 rounded-4 card-lift">
-                <div class="card-body d-flex flex-column position-relative">
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                        {% if profile.profile_picture %}
-                            <img src="{{ profile.profile_picture.url }}" alt="{{ profile.user.get_full_name|default:profile.user.username }}" class="rounded-circle border" style="width: 56px; height: 56px; object-fit: cover;">
-                        {% else %}
-                            <div class="rounded-circle bg-light border d-flex align-items-center justify-content-center text-muted fw-bold" style="width: 56px; height: 56px;">
-                                {{ profile.user.username|slice:":1"|upper }}
-                            </div>
-                        {% endif %}
-                        <div class="min-w-0">
-                            <h5 class="card-title mb-0 text-truncate">
-                                <a class="text-decoration-none stretched-link" href="{% url 'profile_detail' profile.user.id %}">
-                                    {{ profile.user.get_full_name|default:profile.user.username }}
-                                </a>
-                            </h5>
-                            <div class="small text-muted text-truncate">@{{ profile.user.username }}</div>
-                        </div>
-                    </div>
+  <div class="row g-4">
+      {% for profile in profiles %}
+          <div class="col-12 col-sm-6 col-lg-4">
+              <div class="card talent-card h-100 shadow-sm border-0 rounded-4 card-lift">
+                  <div class="card-body d-flex flex-column position-relative">
+                      <div class="d-flex align-items-center gap-3 mb-3">
+                          {% if profile.profile_picture %}
+                              <img src="{{ profile.profile_picture.url }}" alt="{{ profile.user.get_full_name|default:profile.user.username }}" class="rounded-circle border talent-avatar" style="width: 56px; height: 56px; object-fit: cover;">
+                          {% else %}
+                              <div class="rounded-circle border d-flex align-items-center justify-content-center text-dark fw-bold talent-avatar talent-avatar-fallback" style="width: 56px; height: 56px;">
+                                  {{ profile.user.username|slice:":1"|upper }}
+                              </div>
+                          {% endif %}
+                          <div class="min-w-0">
+                              <h5 class="card-title mb-0 text-truncate">
+                                  <a class="text-decoration-none stretched-link" href="{% url 'profile_detail' profile.user.id %}">
+                                      {{ profile.user.get_full_name|default:profile.user.username }}
+                                  </a>
+                              </h5>
+                              <div class="small text-muted text-truncate">@{{ profile.user.username }}</div>
+                          </div>
+                      </div>
 
-                    {% if profile.bio %}
-                        <p class="card-text text-muted mb-3" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-                            {{ profile.bio }}
-                        </p>
-                    {% else %}
-                        <p class="card-text text-muted mb-3">
-                            No bio provided yet.
-                        </p>
-                    {% endif %}
+                      {% if profile.bio %}
+                          <p class="card-text text-muted mb-3" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                              {{ profile.bio }}
+                          </p>
+                      {% else %}
+                          <p class="card-text text-muted mb-3">
+                              No bio provided yet.
+                          </p>
+                      {% endif %}
 
-                    <div class="mb-3">
-                        <div class="small text-muted mb-1">Skills</div>
-                        {% if profile.skills %}
-                            <div class="d-flex flex-wrap gap-2">
-                                <span class="badge text-bg-secondary">{{ profile.skills }}</span>
-                            </div>
-                        {% else %}
-                            <div class="text-muted">No skills listed.</div>
-                        {% endif %}
-                    </div>
+                      <div class="mb-3">
+                          <div class="small text-muted mb-1">Skills</div>
+                          {% if profile.skills %}
+                              <div class="d-flex flex-wrap gap-2">
+                                  <span class="badge rounded-pill skill-pill">{{ profile.skills }}</span>
+                              </div>
+                          {% else %}
+                              <div class="text-muted">No skills listed.</div>
+                          {% endif %}
+                      </div>
 
-                    <div class="mt-auto pt-2">
-                        {% if user.id == profile.user.id %}
-                            <button class="btn btn-gradient-primary rounded-pill w-100" type="button" disabled>Hire Me / Contact</button>
-                        {% else %}
-                            <a href="{% url 'send_message' profile.user.id %}" class="btn btn-gradient-primary rounded-pill w-100 position-relative" style="z-index: 2;">
-                                Hire Me / Contact
-                            </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% empty %}
-        <div class="col-12">
-            <div class="p-5 bg-white rounded-4 shadow-sm border text-center">
-                <h3 class="fw-bold mb-2">No profiles yet</h3>
-                <p class="text-muted mb-0">As users register, their profiles will appear here.</p>
-            </div>
-        </div>
-    {% endfor %}
+                      <div class="mt-auto pt-2">
+                          {% if user.id == profile.user.id %}
+                              <button class="btn btn-gradient-primary rounded-pill w-100" type="button" disabled>Hire Me / Contact</button>
+                          {% else %}
+                              <a href="{% url 'send_message' profile.user.id %}" class="btn btn-gradient-primary rounded-pill w-100 position-relative" style="z-index: 2;">
+                                  Hire Me / Contact
+                              </a>
+                          {% endif %}
+                      </div>
+                  </div>
+              </div>
+          </div>
+      {% empty %}
+          <div class="col-12">
+              <div class="p-5 bg-white rounded-4 shadow-sm border text-center">
+                  <h3 class="fw-bold mb-2">No profiles yet</h3>
+                  <p class="text-muted mb-0">As users register, their profiles will appear here.</p>
+              </div>
+          </div>
+      {% endfor %}
+  </div>
 </div>
 {% endblock %}
 
