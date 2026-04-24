@@ -2,20 +2,81 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h2 class="mb-3">Create Job</h2>
-                <form method="POST" novalidate>
-                    {% csrf_token %}
-                    {{ form|crispy }}
-                    <button type="submit" class="btn btn-primary mt-2">Post Job</button>
-                    <a href="{% url 'employer_dashboard' %}" class="btn btn-outline-secondary mt-2">Cancel</a>
-                </form>
+<style>
+  /* Scoped to Create Job page only */
+  .create-job-page .cj-hero {
+    background: linear-gradient(135deg, rgba(34, 197, 94, .14), rgba(59, 130, 246, .14), rgba(168, 85, 247, .12));
+    border: 1px solid rgba(15, 23, 42, .06);
+  }
+  .create-job-page .cj-badge {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #22c55e, #60a5fa, #a855f7);
+    color: #0b1020;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 .6rem 1.4rem rgba(0, 0, 0, .16);
+  }
+  .create-job-page .cj-card {
+    border: 1px solid rgba(15, 23, 42, .08);
+  }
+  .create-job-page .cj-input {
+    border-radius: 14px;
+    border: 1px solid rgba(15, 23, 42, .12);
+  }
+  .create-job-page .cj-input:focus {
+    border-color: rgba(99, 102, 241, .55);
+    box-shadow: 0 0 0 .25rem rgba(99, 102, 241, .18);
+  }
+  .create-job-page .cj-btn-primary {
+    background: linear-gradient(135deg, #2563eb, #a855f7);
+    border: none;
+  }
+  .create-job-page .cj-btn-primary:hover {
+    filter: brightness(1.03);
+  }
+</style>
+
+<div class="create-job-page">
+  <div class="row justify-content-center">
+      <div class="col-lg-8">
+          <div class="cj-hero rounded-4 p-4 p-md-5 shadow-sm mb-4">
+            <div class="d-flex align-items-start gap-3">
+              <div class="cj-badge" aria-hidden="true">
+                <span style="font-size: 22px; line-height: 1;">📝</span>
+              </div>
+              <div>
+                <h2 class="fw-bold mb-1">Create Job</h2>
+                <div class="text-muted">Post a new vacancy and start receiving applications.</div>
+              </div>
             </div>
-        </div>
-    </div>
+          </div>
+
+          <div class="card cj-card shadow-sm border-0 rounded-4">
+              <div class="card-body p-4 p-md-5">
+                  <form method="POST" novalidate>
+                      {% csrf_token %}
+                      {{ form|crispy }}
+                      <div class="d-flex gap-2 flex-wrap mt-2">
+                        <button type="submit" class="btn cj-btn-primary text-white rounded-pill px-4">Post Job</button>
+                        <a href="{% url 'employer_dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const fields = document.querySelectorAll("input, textarea, select");
+    fields.forEach(function (field) {
+      field.classList.add("cj-input");
+    });
+  });
+</script>
 
 {% endblock %}
