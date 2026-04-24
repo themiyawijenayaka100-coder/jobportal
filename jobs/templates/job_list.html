@@ -1,49 +1,143 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-    <h2 class="mb-0">Available Job Vacancies</h2>
-    <form method="GET" class="d-flex" role="search">
-        <input
-            class="form-control me-2"
-            type="search"
-            name="q"
-            placeholder="Search jobs..."
-            value="{{ q|default:'' }}"
-            aria-label="Search"
-        >
-        <button class="btn btn-outline-primary rounded-pill px-4" type="submit">Search</button>
-    </form>
-</div>
-<div class="row">
-    {% for job in page_obj %}
-    <div class="col-md-6 mb-4">
-        <div class="card shadow-sm border-0 rounded-4 h-100 card-lift">
-            <div class="card-body">
-                <h4 class="card-title text-primary">{{ job.title }}</h4>
-                <h6 class="card-subtitle mb-3 text-muted"><i class="bi bi-building"></i> {{ job.company }}</h6>
-                <p class="card-text">{{ job.description }}</p>
-                <hr>
-                
-                {% if user.is_authenticated %}
-                    {% if job.created_by == user %}
-                        <span class="badge bg-info text-dark w-100 py-2">Your Job Post</span>
-                    {% elif job.applied_status %}
-                        <button class="btn btn-secondary w-100 rounded-pill" disabled>
-                            Applied (Status: {{ job.applied_status }})
-                        </button>
-                    {% else %}
-                        <a href="{% url 'apply_job' job.id %}" class="btn btn-gradient-primary w-100 rounded-pill">Apply Now</a>
-                    {% endif %}
-                {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-outline-primary w-100 rounded-pill">Login to Apply</a>
-                {% endif %}
-            </div>
+<style>
+  /* Scoped to Find Jobs page only */
+  .jobs-page .jobs-hero {
+    background: linear-gradient(135deg, rgba(96, 165, 250, .18), rgba(168, 85, 247, .14), rgba(34, 197, 94, .10));
+    border: 1px solid rgba(15, 23, 42, .06);
+  }
+  .jobs-page .jobs-badge {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #60a5fa, #a855f7, #22c55e);
+    color: #0b1020;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 .6rem 1.4rem rgba(0, 0, 0, .16);
+  }
+  .jobs-page .search-input {
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, .12);
+  }
+  .jobs-page .search-input:focus {
+    border-color: rgba(99, 102, 241, .55);
+    box-shadow: 0 0 0 .25rem rgba(99, 102, 241, .18);
+  }
+  .jobs-page .job-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(15, 23, 42, .06);
+  }
+  .jobs-page .job-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(96,165,250,.12), rgba(168,85,247,.10), rgba(34,197,94,.08));
+    opacity: .95;
+    mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+    -webkit-mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+    padding: 1px;
+    border-radius: 1.25rem;
+  }
+  .jobs-page .job-title {
+    line-height: 1.2;
+  }
+  .jobs-page .job-company {
+    color: rgba(15, 23, 42, .62) !important;
+  }
+  .jobs-page .job-desc {
+    color: rgba(15, 23, 42, .82);
+    line-height: 1.55;
+  }
+  .jobs-page .state-pill {
+    border: 1px solid rgba(15, 23, 42, .10);
+    font-weight: 800;
+    letter-spacing: .2px;
+  }
+  .jobs-page .state-pill.state-own {
+    background: linear-gradient(135deg, rgba(56,189,248,.95), rgba(34,197,94,.70));
+    color: #0b1020;
+  }
+  .jobs-page .state-applied {
+    background: linear-gradient(135deg, rgba(148,163,184,.55), rgba(99,102,241,.22));
+    border: 1px solid rgba(15, 23, 42, .10);
+    color: rgba(15, 23, 42, .80);
+  }
+  .jobs-page .empty-state {
+    background: linear-gradient(135deg, rgba(255,255,255,.95), rgba(255,255,255,.78));
+    border: 1px solid rgba(15, 23, 42, .08);
+  }
+</style>
+
+<div class="jobs-page">
+  <div class="jobs-hero rounded-4 p-4 p-md-5 shadow-sm mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+      <div class="d-flex align-items-start gap-3">
+        <div class="jobs-badge" aria-hidden="true">
+          <span style="font-size: 22px; line-height: 1;">🔎</span>
         </div>
+        <div>
+          <h2 class="mb-1 fw-bold">Find Jobs</h2>
+          <div class="text-muted">Browse current vacancies and apply in one click.</div>
+        </div>
+      </div>
+      <form method="GET" class="d-flex flex-wrap gap-2" role="search">
+          <input
+              class="form-control search-input"
+              type="search"
+              name="q"
+              placeholder="Search jobs..."
+              value="{{ q|default:'' }}"
+              aria-label="Search"
+          >
+          <button class="btn btn-outline-primary rounded-pill px-4" type="submit">Search</button>
+      </form>
     </div>
-    {% empty %}
-    <div class="col-12"><p class="text-muted">No jobs are currently available.</p></div>
-    {% endfor %}
+  </div>
+
+  <div class="row">
+      {% for job in page_obj %}
+      <div class="col-md-6 mb-4">
+          <div class="card job-card shadow-sm border-0 rounded-4 h-100 card-lift">
+              <div class="card-body position-relative">
+                  <h4 class="card-title text-primary job-title">{{ job.title }}</h4>
+                  <h6 class="card-subtitle mb-3 text-muted job-company">{{ job.company }}</h6>
+                  <p class="card-text job-desc">{{ job.description }}</p>
+                  <hr>
+                  
+                  {% if user.is_authenticated %}
+                      {% if job.created_by == user %}
+                          <span class="badge rounded-pill state-pill state-own w-100 py-2">Your Job Post</span>
+                      {% elif job.applied_status %}
+                          <button class="btn w-100 rounded-pill state-applied" disabled>
+                              Applied (Status: {{ job.applied_status }})
+                          </button>
+                      {% else %}
+                          <a href="{% url 'apply_job' job.id %}" class="btn btn-gradient-primary w-100 rounded-pill">Apply Now</a>
+                      {% endif %}
+                  {% else %}
+                      <a href="{% url 'login' %}" class="btn btn-outline-primary w-100 rounded-pill">Login to Apply</a>
+                  {% endif %}
+              </div>
+          </div>
+      </div>
+      {% empty %}
+      <div class="col-12">
+        <div class="p-5 rounded-4 shadow-sm text-center empty-state">
+          <div class="mx-auto mb-2 rounded-circle d-flex align-items-center justify-content-center"
+               style="width:56px;height:56px;background:linear-gradient(135deg,rgba(96,165,250,.25),rgba(168,85,247,.20));">
+            <span aria-hidden="true" style="font-size:22px;">✨</span>
+          </div>
+          <div class="fw-semibold">No jobs are currently available.</div>
+          <div class="text-muted small">Try a different search, or check back later.</div>
+        </div>
+      </div>
+      {% endfor %}
+  </div>
 </div>
 
 {% if page_obj.paginator.num_pages > 1 %}
