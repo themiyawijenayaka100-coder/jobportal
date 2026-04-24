@@ -1,35 +1,80 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="bg-white rounded-4 shadow-sm border p-4 p-md-5">
+<style>
+  /* Scoped to About page only */
+  .about-page .about-hero {
+    background: linear-gradient(135deg, rgba(96, 165, 250, .18), rgba(168, 85, 247, .14), rgba(34, 197, 94, .10));
+    border: 1px solid rgba(15, 23, 42, .06);
+  }
+  .about-page .about-card {
+    border: 1px solid rgba(15, 23, 42, .08);
+    background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.82));
+  }
+  .about-page .about-badge {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #60a5fa, #a855f7);
+    color: #0b1020;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 .6rem 1.4rem rgba(0, 0, 0, .16);
+  }
+  .about-page .feature-box {
+    border: 1px solid rgba(15, 23, 42, .08);
+    background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.78));
+  }
+  .about-page .feature-item {
+    padding: .5rem .75rem;
+    border-radius: .75rem;
+    background: linear-gradient(135deg, rgba(34,197,94,.10), rgba(14,165,233,.08), rgba(168,85,247,.06));
+    border: 1px solid rgba(15, 23, 42, .06);
+  }
+</style>
+
+<div class="about-page">
+  <section class="about-hero rounded-4 shadow-sm p-4 p-md-5 mb-4">
     <div class="row g-4 align-items-center">
-        <div class="col-lg-7">
-            <h2 class="fw-bold mb-3">About Job Portal</h2>
-
-            <p class="text-muted mb-3">
-                Job Portal is a simple web application built using Django that connects job seekers with employers.
-            </p>
-
-            <p class="text-muted mb-3">
-                Users can register, browse jobs, and showcase their profiles, while employers can post opportunities and find suitable candidates.
-            </p>
-
-            <p class="text-muted mb-0">
-                This project demonstrates core web development concepts including authentication, role-based access, and CRUD operations.
-            </p>
+      <div class="col-lg-7">
+        <div class="d-flex align-items-start gap-3 mb-3">
+          <div class="about-badge" aria-hidden="true">
+            <span style="font-size: 22px; line-height: 1;">ℹ️</span>
+          </div>
+          <div>
+            <h2 class="fw-bold mb-1">About Job Portal</h2>
+            <div class="text-muted">A simple Django app connecting talent and employers.</div>
+          </div>
         </div>
 
-        <div class="col-lg-5">
-            <div class="p-4 rounded-4 border bg-light">
-                <h5 class="fw-bold mb-3">Features</h5>
-                <ul class="text-muted">
-                    <li>User registration & login</li>
-                    <li>Edit profile & change password</li>
-                    <li>Job listing & applications</li>
-                    <li>Talent directory</li>
-                </ul>
-            </div>
+        <div class="about-card rounded-4 p-4 shadow-sm">
+          <p class="text-muted mb-3">
+            Job Portal is a simple web application built using Django that connects job seekers with employers.
+          </p>
+
+          <p class="text-muted mb-3">
+            Users can register, browse jobs, and showcase their profiles, while employers can post opportunities and find suitable candidates.
+          </p>
+
+          <p class="text-muted mb-0">
+            This project demonstrates core web development concepts including authentication, role-based access, and CRUD operations.
+          </p>
         </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="feature-box p-4 rounded-4 shadow-sm">
+          <h5 class="fw-bold mb-3">Features</h5>
+          <div class="d-grid gap-2">
+            <div class="feature-item text-muted">User registration & login</div>
+            <div class="feature-item text-muted">Edit profile & change password</div>
+            <div class="feature-item text-muted">Job listing & applications</div>
+            <div class="feature-item text-muted">Talent directory</div>
+          </div>
+        </div>
+      </div>
     </div>
-</section>
+  </section>
+</div>
 {% endblock %}
