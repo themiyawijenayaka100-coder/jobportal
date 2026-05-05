@@ -160,7 +160,6 @@ def update_application_status(request):
     return JsonResponse({"ok": True, "application_id": application.id, "status": application.status})
 
 
-@login_required
 def story_list(request):
     stories = Story.objects.select_related("author").all()
     return render(request, "story_list.html", {"stories": stories})
